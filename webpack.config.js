@@ -21,4 +21,7 @@ export default {
       template: './index.html',
     }),
   ],
+  output: {
+    publicPath: '/',
+  },
 };
