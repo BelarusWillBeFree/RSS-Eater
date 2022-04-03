@@ -1,11 +1,12 @@
 import onChange from 'on-change';
 
-const buildErrorElement = (state) => {
-    const invalidFeedback = document.querySelector('.invalid-feedback');
-    const el = invalidFeedback ?? document.createElement('div');
-    el.classList.add('invalid-feedback');
-    el.textContent = state.i18n.t(state.errors);//state.error;
-    state.view.urlInput.parentNode.append(el);
+const showFeedBack = (state) => {
+    const feedback = state.view.feedback;
+    const { status } = state;
+    feedback.classList.remove('text-success');
+    feedback.classList.remove('text-danger');
+    feedback.classList.add(`text-${status === 'validationError' ? 'danger' : 'success' }`);
+    feedback.textContent = state.i18n.t(state.message.pathI18n);
 };
 
 const refreshFeeds = (state) => {
@@ -26,28 +27,20 @@ const refreshFeeds = (state) => {
     feeds.append(divCard);
 };
 
-
 export default (state) => {
     return onChange(state, (path, value) => {
-        const { urlInput } = state.view;
-        urlInput.focus();
-        urlInput.classList.remove('border-3');
-        urlInput.classList.remove('border-danger');
-        urlInput.classList.remove('is-invalid');
         switch (path) {
             case 'status': 
                 switch (value) {
-                    case 'errorValidation':
-                        urlInput.classList.add('border-3');
-                        urlInput.classList.add('border-danger');
-                        urlInput.classList.add('is-invalid');
-                        buildErrorElement(state);
-                        break;
                     case 'refreshFeed':
-                        urlInput.value = '';
+                        state.view.urlInput.value = '';
+                        state.view.urlInput.focus();
                         refreshFeeds(state);
                         break;
                     }
+                break;
+            case 'message.pathI18n':
+                showFeedBack(state);
                 break;
             default:
         }

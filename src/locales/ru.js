@@ -1,8 +1,9 @@
 export default {
     translation: {
-      errors: {
+      message: {
         urlAlreadyExist: 'Такой URL уже введен ранее',
-        ValidationError: 'это должен быть действительный URL',
+        urlAccess: 'RSS успешно загружен',
+        validationError: 'это должен быть действительный URL',
       },
     },
   };

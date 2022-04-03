@@ -10,7 +10,7 @@ export default () => {
   const state = {
     listOfUrl: [],
     status: 'waitEnterURL',
-    errors: '',
+    message: {},
     view: {
       validateUrl: true,
       urlInput: undefined,
@@ -27,17 +27,23 @@ export default () => {
   })
   .then(()=>{
     state.i18n = i18nInstance;
-  });
-
+    yup.setLocale({
+      mixed: {
+        default: state.i18n.t('message.validationError'),
+      },
+    });
+    });
   const watchedState = getWatcher(state);
   const urlInput = document.getElementById('url-input');
   const form = document.querySelector('form[name="form-search"]');
+  const feedback = document.querySelector('.feedback');
+  watchedState.view.feedback = feedback;
 
   watchedState.view.urlInput = urlInput;
   watchedState.view.feeds = document.querySelector('.feeds');
 
-  const schemaUrl = yup.string().url().trim().required();
-
+//      required: 'URL не должен быть пустым',
+  const schemaUrl = yup.string().required().url().trim();
   form.addEventListener('submit', (objEvent) => {
     objEvent.preventDefault();
     const urlText = urlInput.value;
@@ -46,14 +52,15 @@ export default () => {
       if (urlNotSaved(watchedState, urlText)) {
         watchedState.listOfUrl.push(urlText);
         watchedState.status = 'refreshFeed';
+        watchedState.message.pathI18n = 'message.urlAccess';
       } else {
-        watchedState.errors = 'errors.urlAlreadyExist'
-        watchedState.status = 'errorValidation';
+        watchedState.status = 'validationError';
+        watchedState.message.pathI18n = 'message.urlAlreadyExist'
       }
     })
     .catch(() => {
-      watchedState.errors = 'errors.ValidationError';
-      watchedState.status = 'errorValidation';
+      watchedState.status = 'validationError';
+      watchedState.message.pathI18n = state.i18n.t('message.validationError');
     });
   });
 }
