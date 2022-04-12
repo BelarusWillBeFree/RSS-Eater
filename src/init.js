@@ -4,7 +4,7 @@ import getWatcher from './view.js';
 import resources from './locales/index.js';
 import i18n from 'i18next';
 import axios from 'axios';
-//import url from 'url';
+import _ from 'lodash';
 
 const urlNotSaved = (watchedState, urlText) => (
   watchedState.feeds.find(element => element.url === urlText)
@@ -31,11 +31,11 @@ const initI18next = (state) => {
   });
 }
 
-const parsingRSS = ({contents, contentType}) => {
-  const typeForDOMParser = contentType === 'application/rss+xml' ? 'application/xml' : contentType;
+const parsingRSS = (contents) => {
+  //const typeForDOMParser = contentType === 'application/rss+xml' ? 'application/xml' : contentType;
   const feed = {};
   const posts = [];
-  const domParser = new DOMParser().parseFromString(contents, typeForDOMParser);
+  const domParser = new DOMParser().parseFromString(contents, 'application/xml');//typeForDOMParser
   const title = domParser.querySelector('title');
   feed.title = title?.textContent;
   const description = domParser.querySelector('description');
@@ -49,7 +49,7 @@ const parsingRSS = ({contents, contentType}) => {
       link: link.textContent
     });
   });
-  return { feed, posts};
+  return { parsingFeed:feed, parsingPosts:posts};
 }
 
 const getFeedURL = (urlText) => {
@@ -61,7 +61,7 @@ const getFeedURL = (urlText) => {
   return urlFeed.toString();
 }
 
-const upgradeDataFromFeed = (watchedState, urlText) => {
+/*const upgradeDataFromFeed = (watchedState, urlText) => {
   axios(getFeedURL(urlText)).then((response)=> {
     const { contents, status } = response.data;
     if (status.http_code !== 200) {
@@ -87,8 +87,58 @@ const upgradeDataFromFeed = (watchedState, urlText) => {
       watchedState.message.pathI18n = 'error.networkError';
     })
 }
+*/
+const refreshPostsByFeeds = (watchedState, updateInterval) => {
+  const { feeds, posts } = watchedState;
+  feeds.forEach((feed, indexFeed) => {
+    const { url } = feed;
+    axios(getFeedURL(url)).then((response)=> {
+      const { contents, status } = response.data;
+      if (status.http_code !== 200) {
+        watchedState.status = 'error';
+        watchedState.message.pathI18n = 'error.loadError';
+        return;
+      }
+      watchedState.status = 'refreshFeed';
+      watchedState.message.pathI18n = 'message.urlAccess';
+//      const [contentType,] = status.content_type.split(';');
+      const { parsingFeed, parsingPosts } = parsingRSS(contents);
+      watchedState.feeds[indexFeed] = {url, id: feed.id, title: parsingFeed.title, description: parsingFeed.description};
+      const postsCurrFeed = watchedState.posts.filter(elem => (elem.IDFeed === feed.id));
+      /*const postsNeedAdd = parsingPosts.filter(parsPost => 
+        (postsCurrFeed.find(currPost => 
+          (currPost.link === parsPost.link))!== undefined));
+*/
+          console.log(postsCurrFeed);
+          const postsNeedAdd = _.differenceBy(parsingPosts, postsCurrFeed, 'link');
+          postsNeedAdd.forEach(item => {
+            item.IDFeed = feed.id;
+            watchedState.posts.push(item);
+          });
+
+
+         // console.log(postsNeedAdd);
+/*      posts.forEach(item => {
+        item.feedIndex = watchedState.maxFeedIndex;
+        watchedState.posts.push(item);
+      });
+      feed.url = urlText;
+      feed.index = watchedState.maxFeedIndex++;
+      watchedState.feeds.push(feed);
+      })
+       */
+    })
+    .catch(function () {
+      watchedState.status = 'error';
+      watchedState.message.pathI18n = 'error.networkError';
+    });
+  });
+
+  setTimeout(refreshPostsByFeeds, updateInterval, watchedState, updateInterval);
+}
 
 export default () => {
+  const updateInterval = 5000;
   const state = {
     feeds: [],
     maxFeedIndex: 1,
@@ -112,6 +162,7 @@ export default () => {
   watchedState.view.urlInput = urlInput;
 
   const schemaUrl = yup.string().required().url().trim();
+  setTimeout(refreshPostsByFeeds, 0, watchedState, updateInterval);
   form.addEventListener('submit', (objEvent) => {
     objEvent.preventDefault();
     const urlPath = urlInput.value;
@@ -119,7 +170,8 @@ export default () => {
     schemaUrl.validate(urlPath)
     .then(() => {
       if (urlNotSaved(watchedState, urlPath)) {
-        upgradeDataFromFeed(watchedState, urlPath);
+        const id = watchedState.maxFeedIndex ++;
+        watchedState.feeds.push({ url: urlPath, id });        //upgradeDataFromFeed(watchedState, urlPath);
       } else {
         watchedState.status = 'error';
         watchedState.message.pathI18n = 'error.urlAlreadyExist';
