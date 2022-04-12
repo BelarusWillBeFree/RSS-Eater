@@ -61,9 +61,9 @@ const refreshPosts = (state) => {
 };
 
 export default (state) => {
-    return onChange(state, (path, value) => {
+    return onChange(state, (path) => {
         switch (true) {
-            case /message\.pathI18n/.test(path):
+            case path === 'message.pathI18n':
                 showFeedBack(state);
                 break;
             case path==='feeds':

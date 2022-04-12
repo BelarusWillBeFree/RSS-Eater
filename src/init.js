@@ -60,7 +60,7 @@ const getFeedURL = (urlText) => {
   return urlFeed.toString();
 }
 
-const refreshPostsByFeeds = (watchedState, updateInterval) => {
+const updatePostsByFeed = (watchedState) => {
   const { feeds } = watchedState;
   feeds.forEach((feed, indexFeed) => {
     const { url } = feed;
@@ -87,8 +87,11 @@ const refreshPostsByFeeds = (watchedState, updateInterval) => {
       watchedState.message.pathI18n = 'error.networkError';
     });
   });
+}
 
-  setTimeout(refreshPostsByFeeds, updateInterval, watchedState, updateInterval);
+const startUpdateDataForInterval = (watchedState, updateInterval) => {
+  updatePostsByFeed(watchedState);
+  setTimeout(startUpdateDataForInterval, updateInterval, watchedState, updateInterval);
 }
 
 export default () => {
@@ -116,7 +119,7 @@ export default () => {
   watchedState.view.urlInput = urlInput;
 
   const schemaUrl = yup.string().required().url().trim();
-  setTimeout(refreshPostsByFeeds, 0, watchedState, updateInterval);
+  setTimeout(startUpdateDataForInterval, 0, watchedState, updateInterval);
   form.addEventListener('submit', (objEvent) => {
     objEvent.preventDefault();
     const urlPath = urlInput.value;
@@ -126,6 +129,7 @@ export default () => {
       if (urlNotSaved(watchedState, urlPath)) {
         const id = watchedState.maxFeedIndex ++;
         watchedState.feeds.push({ url: urlPath, id });
+        updatePostsByFeed(watchedState);
       } else {
         watchedState.status = 'error';
         watchedState.message.pathI18n = 'error.urlAlreadyExist';
