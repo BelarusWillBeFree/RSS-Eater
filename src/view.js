@@ -70,6 +70,7 @@ export default (state) => {
                 state.view.urlInput.value = '';
                 state.view.urlInput.focus();
                 refreshFeeds(state);
+                refreshPosts(state);
                 break;
             case /^feeds\./.test(path):
                 refreshFeeds(state);
