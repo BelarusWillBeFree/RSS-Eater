@@ -58,24 +58,23 @@ const refreshPosts = (state) => {
     });
     divCard.append(ul);
     postsDiv.append(divCard);
-
 };
 
 export default (state) => {
     return onChange(state, (path, value) => {
-        switch (true) {//path
-            case /message\.pathI18n/.test(path)://'message.pathI18n'
+        switch (true) {
+            case /message\.pathI18n/.test(path):
                 showFeedBack(state);
                 break;
-            case path==='feeds': //'feeds':
+            case path==='feeds':
                 state.view.urlInput.value = '';
                 state.view.urlInput.focus();
                 refreshFeeds(state);
                 break;
-            case /^feeds\./.test(path): //'feeds':
+            case /^feeds\./.test(path):
                 refreshFeeds(state);
                 break;
-            case path === 'posts': //'posts':
+            case path === 'posts':
                 refreshPosts(state);
                 break;
             default:

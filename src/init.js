@@ -32,10 +32,9 @@ const initI18next = (state) => {
 }
 
 const parsingRSS = (contents) => {
-  //const typeForDOMParser = contentType === 'application/rss+xml' ? 'application/xml' : contentType;
   const feed = {};
   const posts = [];
-  const domParser = new DOMParser().parseFromString(contents, 'application/xml');//typeForDOMParser
+  const domParser = new DOMParser().parseFromString(contents, 'application/xml');
   const title = domParser.querySelector('title');
   feed.title = title?.textContent;
   const description = domParser.querySelector('description');
@@ -61,35 +60,8 @@ const getFeedURL = (urlText) => {
   return urlFeed.toString();
 }
 
-/*const upgradeDataFromFeed = (watchedState, urlText) => {
-  axios(getFeedURL(urlText)).then((response)=> {
-    const { contents, status } = response.data;
-    if (status.http_code !== 200) {
-      watchedState.status = 'error';
-      watchedState.message.pathI18n = 'error.loadError';
-      return;
-    }
-    watchedState.status = 'refreshFeed';
-    watchedState.message.pathI18n = 'message.urlAccess';
-    const [contentType,] = status.content_type.split(';');
-    const { feed, posts } = parsingRSS({ contents, contentType });
-
-    posts.forEach(item => {
-      item.feedIndex = watchedState.maxFeedIndex;
-      watchedState.posts.push(item);
-    });
-    feed.url = urlText;
-    feed.index = watchedState.maxFeedIndex++;
-    watchedState.feeds.push(feed);
-    })
-    .catch(function () {
-      watchedState.status = 'error';
-      watchedState.message.pathI18n = 'error.networkError';
-    })
-}
-*/
 const refreshPostsByFeeds = (watchedState, updateInterval) => {
-  const { feeds, posts } = watchedState;
+  const { feeds } = watchedState;
   feeds.forEach((feed, indexFeed) => {
     const { url } = feed;
     axios(getFeedURL(url)).then((response)=> {
@@ -101,32 +73,14 @@ const refreshPostsByFeeds = (watchedState, updateInterval) => {
       }
       watchedState.status = 'refreshFeed';
       watchedState.message.pathI18n = 'message.urlAccess';
-//      const [contentType,] = status.content_type.split(';');
       const { parsingFeed, parsingPosts } = parsingRSS(contents);
       watchedState.feeds[indexFeed] = {url, id: feed.id, title: parsingFeed.title, description: parsingFeed.description};
       const postsCurrFeed = watchedState.posts.filter(elem => (elem.IDFeed === feed.id));
-      /*const postsNeedAdd = parsingPosts.filter(parsPost => 
-        (postsCurrFeed.find(currPost => 
-          (currPost.link === parsPost.link))!== undefined));
-*/
-          console.log(postsCurrFeed);
-          const postsNeedAdd = _.differenceBy(parsingPosts, postsCurrFeed, 'link');
-          postsNeedAdd.forEach(item => {
-            item.IDFeed = feed.id;
-            watchedState.posts.push(item);
-          });
-
-
-         // console.log(postsNeedAdd);
-/*      posts.forEach(item => {
-        item.feedIndex = watchedState.maxFeedIndex;
+      const postsNeedAdd = _.differenceBy(parsingPosts, postsCurrFeed, 'link');
+      postsNeedAdd.forEach(item => {
+        item.IDFeed = feed.id;
         watchedState.posts.push(item);
       });
-      feed.url = urlText;
-      feed.index = watchedState.maxFeedIndex++;
-      watchedState.feeds.push(feed);
-      })
-       */
     })
     .catch(function () {
       watchedState.status = 'error';
@@ -171,7 +125,7 @@ export default () => {
     .then(() => {
       if (urlNotSaved(watchedState, urlPath)) {
         const id = watchedState.maxFeedIndex ++;
-        watchedState.feeds.push({ url: urlPath, id });        //upgradeDataFromFeed(watchedState, urlPath);
+        watchedState.feeds.push({ url: urlPath, id });
       } else {
         watchedState.status = 'error';
         watchedState.message.pathI18n = 'error.urlAlreadyExist';
