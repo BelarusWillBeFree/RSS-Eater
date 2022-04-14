@@ -35,6 +35,16 @@ const refreshFeeds = (state) => {
     feedDiv.append(divCard);
 };
 
+const changeColorInLink = (idPost, state) => {
+    const needAddIdPost = state.view.viewedPosts.filter(elem => elem === idPost).length === 0;
+    if (needAddIdPost) {
+        state.view.viewedPosts.push(idPost);
+        const linkChangeColor = document.querySelector(`a[data-post-id="${idPost}"]`);
+        linkChangeColor.classList.remove('fw-bold');
+        linkChangeColor.classList.add('fw-normal');
+    }
+}
+
 const refreshPosts = (state) => {
     const { postsDiv } = state.view;
     const { posts } = state;
@@ -47,13 +57,40 @@ const refreshPosts = (state) => {
     posts.forEach((item) => {
         const li = document.createElement('li');
         setClassesFromStr(li, 'list-group-item d-flex justify-content-between align-items-start border-0 border-end-0');
+
         const link = document.createElement('a');
         link.setAttribute('href', item.link);
         link.setAttribute('rel', 'noopener noreferrer');
         link.setAttribute('target', '_blank');
-        setClassesFromStr(link, 'fw-bold');
+        link.setAttribute('data-post-id', item.idPost);
+        const linkViewed = state.view.viewedPosts.filter(elem => elem === item.idPost).length > 0;
+        setClassesFromStr(link, linkViewed ? 'fw-normal' : 'fw-bold');
         link.textContent = item.title;
+        link.addEventListener('click', (objEvent) => {
+            const idPost = objEvent.target.getAttribute('data-post-id');
+            changeColorInLink(idPost, state);
+        });
+
+        const button = document.createElement('button');
+        setClassesFromStr(button, 'btn btn-outline-primary btn-sm');
+        button.setAttribute('data-bs-toggle', 'modal');
+        button.setAttribute('data-bs-target', '#modal');
+        button.setAttribute('data-post-id', item.idPost);
+        button.textContent = 'Просмотр';
+        button.addEventListener('click', (objEvent) => {
+            const idPost = objEvent.target.getAttribute('data-post-id');
+            const [filteredPost, ] = state.posts.filter((post) => (post.idPost === idPost));
+            const { modal } = state.view;
+            const title = modal.querySelector('.modal-title');
+            title.textContent = filteredPost.title;
+            const body = modal.querySelector('.modal-body');
+            body.innerHTML = `<p>${filteredPost.description}</p>`;
+            const btnRead = modal.querySelector('.full-article');
+            btnRead.setAttribute('href', filteredPost.link);
+            changeColorInLink(idPost, state);
+        });
         li.append(link);
+        li.append(button);
         ul.append(li);
     });
     divCard.append(ul);

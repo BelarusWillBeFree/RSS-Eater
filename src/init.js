@@ -43,9 +43,11 @@ const parsingRSS = (contents) => {
   Array.from(items).forEach((elemItem)=>{
     const [title, ] = Array.from(elemItem.children).filter(node => node.nodeName === 'title');
     const [link, ] = Array.from(elemItem.children).filter(node => node.nodeName === 'link');
+    const [description, ] = Array.from(elemItem.children).filter(node => node.nodeName === 'description');
     posts.push({
       title: title.textContent,
-      link: link.textContent
+      link: link.textContent,
+      description: description.textContent
     });
   });
   return { parsingFeed:feed, parsingPosts:posts};
@@ -75,10 +77,12 @@ const updatePostsByFeed = (watchedState) => {
       watchedState.message.pathI18n = 'message.urlAccess';
       const { parsingFeed, parsingPosts } = parsingRSS(contents);
       watchedState.feeds[indexFeed] = {url, id: feed.id, title: parsingFeed.title, description: parsingFeed.description};
-      const postsCurrFeed = watchedState.posts.filter(elem => (elem.IDFeed === feed.id));
+      const postsCurrFeed = watchedState.posts.filter(elem => (elem.idFeed === feed.id));
       const postsNeedAdd = _.differenceBy(parsingPosts, postsCurrFeed, 'link');
       postsNeedAdd.forEach(item => {
-        item.IDFeed = feed.id;
+        item.idFeed = feed.id;
+        const idPost = `${feed.id}-${watchedState.maxPostID ++}`;
+        item.idPost = idPost;
         watchedState.posts.push(item);
       });
     })
@@ -98,13 +102,15 @@ export default () => {
   const updateInterval = 5000;
   const state = {
     feeds: [],
-    maxFeedIndex: 1,
+    maxFeedID: 0,
     posts: [],
+    maxPostID: 0,
     status: 'waitEnterURL',
     message: {},
     view: {
       validateUrl: true,
       urlInput: undefined,
+      viewedPosts: [],
     },
   };
   initI18next(state);
@@ -116,6 +122,7 @@ export default () => {
   watchedState.view.feedback = document.querySelector('.feedback');
   watchedState.view.feedDiv = document.querySelector('.feeds');
   watchedState.view.postsDiv = document.querySelector('.posts');
+  watchedState.view.modal = document.getElementById('modal');
   watchedState.view.urlInput = urlInput;
 
   const schemaUrl = yup.string().required().url().trim();
@@ -127,7 +134,7 @@ export default () => {
     schemaUrl.validate(urlPath)
     .then(() => {
       if (urlNotSaved(watchedState, urlPath)) {
-        const id = watchedState.maxFeedIndex ++;
+        const id = watchedState.maxFeedID ++;
         watchedState.feeds.push({ url: urlPath, id });
         updatePostsByFeed(watchedState);
       } else {
