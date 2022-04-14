@@ -2,8 +2,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
-import init from './init.js';
+import app from './app.js';
 
-import './main.css';
-
-init();
+app();
