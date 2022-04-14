@@ -9,10 +9,10 @@ export default {
         urlAccess: 'RSS успешно загружен',
       },
       error: {
-        urlAlreadyExist: 'Такой URL уже введен ранее',
-        validationError: 'это должен быть действительный URL',
-        loadError: 'ошибка загрузки данных из RSS',
-        networkError: 'ошибка сети',
+        urlAlreadyExist: 'RSS уже существует',
+        validationError: 'Ссылка должна быть валидным URL',
+        loadError: 'Ресурс не содержит валидный RSS',
+        networkError: 'Ошибка сети',
       },
     },
   };
