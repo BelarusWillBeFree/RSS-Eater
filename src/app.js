@@ -105,6 +105,7 @@ const eventSubmit = (watchedState) => {
   const schemaUrl = yup.string().required().url().trim();
   const urlInput = document.getElementById('url-input');
   const urlPath = urlInput.value;
+  console.log(urlPath);
   watchedState.status = 'message.validation';
   schemaUrl.validate(urlPath)
   .then(() => {
@@ -140,7 +141,6 @@ const main = () => {
   const watchedState = getWatcher(state);
   initViewElements(watchedState);
   const form = document.querySelector('form[name="form-search"]');
-  console.log(form);
   setTimeout(updatePostsByInterval, 0, watchedState, updateInterval);
   form.addEventListener('submit', (objEvent) => {
     objEvent.preventDefault();
