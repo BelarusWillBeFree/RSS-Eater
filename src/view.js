@@ -116,7 +116,7 @@ const refreshPosts = (state) => {
 };
 
 export default (state) => {
-    return onChange(state, (path, value, preventValue) => {
+    return onChange(state, (path, value) => {
         switch (path) {
             case 'status':
                 if (value === 'message.validation') allowButton(state, true);
