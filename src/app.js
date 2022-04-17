@@ -43,6 +43,7 @@ const getFeedURL = (urlText) => {
 
 const processingResponse = (response, watchedState, url, showMessage) => {
   const { contents, status } = response.data;
+  console.log('status', status);
   if (status.http_code !== 200) {
     watchedState.status = 'error.loadError';
     return;
