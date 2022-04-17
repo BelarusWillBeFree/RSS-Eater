@@ -78,9 +78,11 @@ const loadByURL = (url, watchedState, showMessage = true) => {
   const allOriginsPath = getFeedURL(url);
   console.log(allOriginsPath);
   axios(allOriginsPath).then((response)=> {
+    console.log('response ',response);
     processingResponse(response, watchedState, url, showMessage);
   })
-  .catch(function () {
+  .catch(function (err) {
+    console.log('network error ',err);
     watchedState.status = 'error.networkError';
   });
 }
