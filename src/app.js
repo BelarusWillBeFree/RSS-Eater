@@ -122,7 +122,7 @@ const eventSubmit = (watchedState) => {
     }
   })
   .catch(() => {
-    watchedState.status = 'error.loadError';
+    watchedState.status = 'error.validationError';
   });
 
 }
