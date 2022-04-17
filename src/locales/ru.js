@@ -7,6 +7,8 @@ export default {
       },
       message: {
         urlAccess: 'RSS успешно загружен',
+        validation: 'выполняется валидация URL',
+        downloadData: 'загрузка данных',
       },
       error: {
         urlAlreadyExist: 'RSS уже существует',

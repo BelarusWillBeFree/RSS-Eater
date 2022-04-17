@@ -1,12 +1,21 @@
 import onChange from 'on-change';
 
+const allowButton = (state, disabled = false) => {
+    if (disabled) {
+        state.view.buttonSubmit.setAttribute('disabled', 'disabled');
+    } else {
+        state.view.buttonSubmit.removeAttribute('disabled');
+    }
+}
 const showFeedBack = (state) => {
     const feedback = state.view.feedback;
     const { status } = state;
+    const [typeStatus,] = status.split('.');
     feedback.classList.remove('text-success');
     feedback.classList.remove('text-danger');
-    feedback.classList.add(`text-${status === 'error' ? 'danger' : 'success' }`);
-    feedback.textContent = state.i18n.t(state.message.pathI18n);
+    feedback.classList.add(`text-${typeStatus === 'error' ? 'danger' : 'success' }`);
+    if (typeStatus === 'error') allowButton(state, false);
+    feedback.textContent = state.i18n.t(status);
 };
 
 const setClassesFromStr = (element, strClass) => {
@@ -45,6 +54,44 @@ const changeColorInLink = (idPost, state) => {
     }
 }
 
+const addNewLink = (item, state) => {
+    const link = document.createElement('a');
+    link.setAttribute('href', item.link);
+    link.setAttribute('rel', 'noopener noreferrer');
+    link.setAttribute('target', '_blank');
+    link.setAttribute('data-post-id', item.idPost);
+    const linkViewed = state.view.viewedPosts.filter(elem => elem === item.idPost).length > 0;
+    setClassesFromStr(link, linkViewed ? 'fw-normal' : 'fw-bold');
+    link.textContent = item.title;
+    link.addEventListener('click', (objEvent) => {
+        const idPost = objEvent.target.getAttribute('data-post-id');
+        changeColorInLink(idPost, state);
+    });
+    return link;
+}
+
+const addNewButton = (item, state) => {
+    const button = document.createElement('button');
+    setClassesFromStr(button, 'btn btn-outline-primary btn-sm');
+    button.setAttribute('data-bs-toggle', 'modal');
+    button.setAttribute('data-bs-target', '#modal');
+    button.setAttribute('data-post-id', item.idPost);
+    button.textContent = 'Просмотр';
+    button.addEventListener('click', (objEvent) => {
+        const idPost = objEvent.target.getAttribute('data-post-id');
+        const [filteredPost, ] = state.posts.filter((post) => (post.idPost === idPost));
+        const { modal } = state.view;
+        const title = modal.querySelector('.modal-title');
+        title.textContent = filteredPost.title;
+        const body = modal.querySelector('.modal-body');
+        body.innerHTML = `<p>${filteredPost.description}</p>`;
+        const btnRead = modal.querySelector('.full-article');
+        btnRead.setAttribute('href', filteredPost.link);
+        changeColorInLink(idPost, state);
+    });
+    return button;
+}
+
 const refreshPosts = (state) => {
     const { postsDiv } = state.view;
     const { posts } = state;
@@ -58,37 +105,8 @@ const refreshPosts = (state) => {
         const li = document.createElement('li');
         setClassesFromStr(li, 'list-group-item d-flex justify-content-between align-items-start border-0 border-end-0');
 
-        const link = document.createElement('a');
-        link.setAttribute('href', item.link);
-        link.setAttribute('rel', 'noopener noreferrer');
-        link.setAttribute('target', '_blank');
-        link.setAttribute('data-post-id', item.idPost);
-        const linkViewed = state.view.viewedPosts.filter(elem => elem === item.idPost).length > 0;
-        setClassesFromStr(link, linkViewed ? 'fw-normal' : 'fw-bold');
-        link.textContent = item.title;
-        link.addEventListener('click', (objEvent) => {
-            const idPost = objEvent.target.getAttribute('data-post-id');
-            changeColorInLink(idPost, state);
-        });
-
-        const button = document.createElement('button');
-        setClassesFromStr(button, 'btn btn-outline-primary btn-sm');
-        button.setAttribute('data-bs-toggle', 'modal');
-        button.setAttribute('data-bs-target', '#modal');
-        button.setAttribute('data-post-id', item.idPost);
-        button.textContent = 'Просмотр';
-        button.addEventListener('click', (objEvent) => {
-            const idPost = objEvent.target.getAttribute('data-post-id');
-            const [filteredPost, ] = state.posts.filter((post) => (post.idPost === idPost));
-            const { modal } = state.view;
-            const title = modal.querySelector('.modal-title');
-            title.textContent = filteredPost.title;
-            const body = modal.querySelector('.modal-body');
-            body.innerHTML = `<p>${filteredPost.description}</p>`;
-            const btnRead = modal.querySelector('.full-article');
-            btnRead.setAttribute('href', filteredPost.link);
-            changeColorInLink(idPost, state);
-        });
+        const link = addNewLink(item, state);
+        const button = addNewButton(item, state);
         li.append(link);
         li.append(button);
         ul.append(li);
@@ -98,21 +116,20 @@ const refreshPosts = (state) => {
 };
 
 export default (state) => {
-    return onChange(state, (path) => {
-        switch (true) {
-            case path === 'message.pathI18n':
+    return onChange(state, (path, value, preventValue) => {
+        switch (path) {
+            case 'status':
+                if (value === 'message.validation') allowButton(state, true);
                 showFeedBack(state);
                 break;
-            case path==='feeds':
+            case 'feeds':
                 state.view.urlInput.value = '';
                 state.view.urlInput.focus();
+                allowButton(state, false);
                 refreshFeeds(state);
                 refreshPosts(state);
                 break;
-            case /^feeds\./.test(path):
-                refreshFeeds(state);
-                break;
-            case path === 'posts':
+            case 'posts':
                 refreshPosts(state);
                 break;
             default:
