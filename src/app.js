@@ -44,10 +44,10 @@ const getFeedURL = (urlText) => {
 const processingResponse = (response, watchedState, url, showMessage) => {
   const { contents, status } = response.data;
   console.log('status', status, 'contents', contents);
-  if (status !== undefined && status.http_code !== 200) {
+/*  if (status !== undefined && status.http_code !== 200) {
     watchedState.status = 'error.loadError';
     return;
-  }
+  }*/
   if (showMessage)
     watchedState.status = 'message.urlAccess';
   const { parsingFeed, parsingPosts } = parsingRSS(contents);
@@ -122,7 +122,7 @@ const eventSubmit = (watchedState) => {
     }
   })
   .catch(() => {
-    watchedState.status = 'error.validationError';
+    watchedState.status = 'error.loadError';
   });
 
 }
