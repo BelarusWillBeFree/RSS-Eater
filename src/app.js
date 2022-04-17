@@ -37,7 +37,7 @@ const getFeedURL = (urlText) => {
   const urlFeed = new URL(pathAllOrigins);
   urlFeed.searchParams.set('url', urlText);
   urlFeed.searchParams.set('disableCache', 'true');
-  urlFeed.searchParams.set('charset', 'utf-8');
+//  urlFeed.searchParams.set('charset', 'utf-8');
   return urlFeed.toString();
 }
 
@@ -75,7 +75,9 @@ const processingResponse = (response, watchedState, url, showMessage) => {
 }
 
 const loadByURL = (url, watchedState, showMessage = true) => {
-  axios(getFeedURL(url)).then((response)=> {
+  const allOriginsPath = getFeedURL(url);
+  console.log(allOriginsPath);
+  axios(allOriginsPath).then((response)=> {
     processingResponse(response, watchedState, url, showMessage);
   })
   .catch(function () {
