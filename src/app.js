@@ -48,11 +48,11 @@ const processingResponse = (response, watchedState, url, showMessage) => {
     watchedState.status = 'error.loadError';
     return;
   }
-  if (showMessage){
+  if (showMessage) {
     watchedState.status = 'message.urlAccess';
   }
-  let [savedFeed, ] = watchedState.feeds.filter((feed) => (feed.url === url));
-  if (savedFeed === undefined){
+  let [savedFeed] = watchedState.feeds.filter((feed) => (feed.url === url));
+  if (savedFeed === undefined) {
     savedFeed = {
       url: watchedState.currentURL,
       id: watchedState.id.feed,
@@ -61,7 +61,7 @@ const processingResponse = (response, watchedState, url, showMessage) => {
     };
     watchedState.feeds.push(savedFeed);
     watchedState.currentURL = undefined;
-    watchedState.id.feed =+ 1;
+    watchedState.id.feed = +1;
   }
 
   const postsCurrFeed = watchedState.posts.filter((elem) => (elem.idFeed === savedFeed.id));
@@ -70,7 +70,7 @@ const processingResponse = (response, watchedState, url, showMessage) => {
   postsNeedAdd.forEach((item) => {
     item.idFeed = savedFeed.id;
     const idPost = `${savedFeed.id}-${watchedState.id.post}`;
-    watchedState.id.post =+ 1;
+    watchedState.id.post = +1;
     item.idPost = idPost;
     watchedState.posts.push(item);
   });
@@ -81,9 +81,9 @@ const loadByURL = (url, watchedState, showMessage = true) => {
   axios(allOriginsPath).then((response) => {
     processingResponse(response, watchedState, url, showMessage);
   })
-  .catch(function () {
-    watchedState.status = 'error.networkError';
-  });
+    .catch(() => {
+      watchedState.status = 'error.networkError';
+    });
 };
 
 const updatePostsByInterval = (watchedState, updateInterval) => {
@@ -110,18 +110,17 @@ const eventSubmit = (watchedState) => {
   const urlPath = urlInput.value;
   watchedState.status = 'message.validation';
   schemaUrl.validate(urlPath)
-  .then(() => {
-    if (urlNotSaved(watchedState, urlPath)) {
-      watchedState.currentURL = urlPath;
-      loadByURL(urlPath, watchedState);
-    } else {
-      watchedState.status = 'error.urlAlreadyExist';
-    }
-  })
-  .catch(() => {
-    watchedState.status = 'error.validationError';
-  });
-
+    .then(() => {
+      if (urlNotSaved(watchedState, urlPath)) {
+        watchedState.currentURL = urlPath;
+        loadByURL(urlPath, watchedState);
+      } else {
+        watchedState.status = 'error.urlAlreadyExist';
+      }
+    })
+    .catch(() => {
+      watchedState.status = 'error.validationError';
+    });
 };
 
 const main = () => {

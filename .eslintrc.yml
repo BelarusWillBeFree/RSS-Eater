@@ -1,0 +1,21 @@
+---
+
+
+
+env:
+  jest: true
+  browser: true
+  es2020: true
+
+extends:
+  - 'airbnb-base'
+
+
+parserOptions:
+  ecmaVersion: latest
+
+rules:
+  import/extensions: 0
+  import/no-unresolved: 0
+  no-param-reassign: 0
+  no-console: 0
