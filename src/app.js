@@ -82,7 +82,7 @@ const loadByURL = (url, watchedState, showMessage = true) => {
     processingResponse(response, watchedState, url, showMessage);
   })
   .catch(function (err) {
-    console.log('network error ',err);
+    console.log('url ', allOriginsPath,' network error ',err);
     watchedState.status = 'error.networkError';
   });
 }
