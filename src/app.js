@@ -48,9 +48,13 @@ const processingResponse = (response, watchedState, url, showMessage) => {
     watchedState.status = 'error.loadError';
     return;
   }*/
+  const { parsingFeed, parsingPosts } = parsingRSS(contents);
+  if (parsingFeed.title === undefined) {
+    watchedState.status = 'error.loadError';
+    return;
+  } 
   if (showMessage)
     watchedState.status = 'message.urlAccess';
-  const { parsingFeed, parsingPosts } = parsingRSS(contents);
   let [savedFeed,] = watchedState.feeds.filter(feed => (feed.url === url));
   if (savedFeed === undefined){
     savedFeed = {

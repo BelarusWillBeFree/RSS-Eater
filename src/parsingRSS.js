@@ -21,7 +21,7 @@ const parsingRSS = (contents) => {
     const title = domParser.querySelector('title');
     const description = domParser.querySelector('description');
     const items = domParser.querySelectorAll('item');
-  
+ 
     feed.title = title?.textContent;
     feed.description = description?.textContent;
   
