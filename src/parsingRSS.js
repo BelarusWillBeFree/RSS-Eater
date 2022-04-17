@@ -1,7 +1,7 @@
 
 const getPostsFromDOM = (items) => {
     const posts = [];
-    Array.from(items).forEach((elemItem)=>{
+    Array.from(items).forEach((elemItem) => {
       const [title, ] = Array.from(elemItem.children).filter(node => node.nodeName === 'title');
       const [link, ] = Array.from(elemItem.children).filter(node => node.nodeName === 'link');
       const [description, ] = Array.from(elemItem.children).filter(node => node.nodeName === 'description');

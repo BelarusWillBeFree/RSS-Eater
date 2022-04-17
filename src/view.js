@@ -12,7 +12,7 @@ const blockInputElements = (state, disabled = false) => {
 const showFeedBack = (state) => {
     const feedback = state.view.feedback;
     const { status } = state;
-    const [typeStatus,] = status.split('.');
+    const [typeStatus, ] = status.split('.');
     feedback.classList.remove('text-success');
     feedback.classList.remove('text-danger');
     feedback.classList.add(`text-${typeStatus === 'error' ? 'danger' : 'success' }`);
@@ -21,10 +21,10 @@ const showFeedBack = (state) => {
 };
 
 const setClassesFromStr = (element, strClass) => {
-    strClass.split(' ').forEach((classForAdd)=>{
+    strClass.split(' ').forEach((classForAdd) => {
         element.classList.add(classForAdd);
     });
-}
+};
 
 const refreshFeeds = (state) => {
     const { feedDiv } = state.view;
@@ -47,14 +47,14 @@ const refreshFeeds = (state) => {
 };
 
 const changeColorInLink = (idPost, state) => {
-    const needAddIdPost = state.view.viewedPosts.filter(elem => elem === idPost).length === 0;
+    const needAddIdPost = state.view.viewedPosts.filter((elem) => elem === idPost).length === 0;
     if (needAddIdPost) {
         state.view.viewedPosts.push(idPost);
         const linkChangeColor = document.querySelector(`a[data-post-id="${idPost}"]`);
         linkChangeColor.classList.remove('fw-bold');
         linkChangeColor.classList.add('fw-normal');
     }
-}
+};
 
 const addNewLink = (item, state) => {
     const link = document.createElement('a');
@@ -62,7 +62,7 @@ const addNewLink = (item, state) => {
     link.setAttribute('rel', 'noopener noreferrer');
     link.setAttribute('target', '_blank');
     link.setAttribute('data-post-id', item.idPost);
-    const linkViewed = state.view.viewedPosts.filter(elem => elem === item.idPost).length > 0;
+    const linkViewed = state.view.viewedPosts.filter((elem) => elem === item.idPost).length > 0;
     setClassesFromStr(link, linkViewed ? 'fw-normal' : 'fw-bold');
     link.textContent = item.title;
     link.addEventListener('click', (objEvent) => {
@@ -70,7 +70,7 @@ const addNewLink = (item, state) => {
         changeColorInLink(idPost, state);
     });
     return link;
-}
+};
 
 const addNewButton = (item, state) => {
     const button = document.createElement('button');
@@ -92,7 +92,7 @@ const addNewButton = (item, state) => {
         changeColorInLink(idPost, state);
     });
     return button;
-}
+};
 
 const refreshPosts = (state) => {
     const { postsDiv } = state.view;
@@ -137,4 +137,4 @@ export default (state) => {
             default:
         }
     });
-}
+};
