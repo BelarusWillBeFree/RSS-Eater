@@ -1,10 +1,12 @@
 import onChange from 'on-change';
 
-const allowButton = (state, disabled = false) => {
+const blockInputElements = (state, disabled = false) => {
     if (disabled) {
         state.view.buttonSubmit.setAttribute('disabled', 'disabled');
+        state.view.urlInput.setAttribute('readonly', 'true');
     } else {
         state.view.buttonSubmit.removeAttribute('disabled');
+        state.view.urlInput.removeAttribute('readonly');
     }
 }
 const showFeedBack = (state) => {
@@ -14,7 +16,7 @@ const showFeedBack = (state) => {
     feedback.classList.remove('text-success');
     feedback.classList.remove('text-danger');
     feedback.classList.add(`text-${typeStatus === 'error' ? 'danger' : 'success' }`);
-    if (typeStatus === 'error') allowButton(state, false);
+    if (typeStatus === 'error') blockInputElements(state, false);
     feedback.textContent = state.i18n.t(status);
 };
 
@@ -119,13 +121,13 @@ export default (state) => {
     return onChange(state, (path, value) => {
         switch (path) {
             case 'status':
-                if (value === 'message.validation') allowButton(state, true);
+                if (value === 'message.validation') blockInputElements(state, true);
                 showFeedBack(state);
                 break;
             case 'feeds':
                 state.view.urlInput.value = '';
                 state.view.urlInput.focus();
-                allowButton(state, false);
+                blockInputElements(state, false);
                 refreshFeeds(state);
                 refreshPosts(state);
                 break;

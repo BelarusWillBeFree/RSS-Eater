@@ -43,11 +43,8 @@ const getFeedURL = (urlText) => {
 
 const processingResponse = (response, watchedState, url, showMessage) => {
   const { contents, status } = response.data;
-  console.log('status', status, 'contents', contents);
-/*  if (status !== undefined && status.http_code !== 200) {
-    watchedState.status = 'error.loadError';
-    return;
-  }*/
+//  console.log('status', status, 'contents', contents);
+
   const { parsingFeed, parsingPosts } = parsingRSS(contents);
   if (parsingFeed.title === undefined) {
     watchedState.status = 'error.loadError';
@@ -81,13 +78,13 @@ const processingResponse = (response, watchedState, url, showMessage) => {
 
 const loadByURL = (url, watchedState, showMessage = true) => {
   const allOriginsPath = getFeedURL(url);
-  console.log(allOriginsPath);
+  //console.log(allOriginsPath);
   axios(allOriginsPath).then((response)=> {
-    console.log('response ',response);
+    //console.log('response ',response);
     processingResponse(response, watchedState, url, showMessage);
   })
-  .catch(function (err) {
-    console.log('url ', allOriginsPath,' network error ',err);
+  .catch(function () {
+    //console.log('url ', allOriginsPath,' network error ',err);
     watchedState.status = 'error.networkError';
   });
 }
@@ -114,7 +111,7 @@ const eventSubmit = (watchedState) => {
   const schemaUrl = yup.string().required().url().trim();
   const urlInput = document.getElementById('url-input');
   const urlPath = urlInput.value;
-  console.log(urlPath);
+  //console.log(urlPath);
   watchedState.status = 'message.validation';
   schemaUrl.validate(urlPath)
   .then(() => {
