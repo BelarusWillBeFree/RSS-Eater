@@ -1,14 +1,14 @@
 // @ts-check
 import * as yup from 'yup';
-import getWatcher from './view.js';
-import resources from './locales/index.js';
 import i18n from 'i18next';
 import axios from 'axios';
 import _ from 'lodash';
+import getWatcher from './view.js';
+import resources from './locales/index.js';
 import parsingRSS from './parsingRSS.js';
 
 const urlNotSaved = (watchedState, urlText) => (
-  watchedState.feeds.find(feed => feed.url === urlText)
+  watchedState.feeds.find((feed) => feed.url === urlText)
    === undefined
   );
 
@@ -37,13 +37,11 @@ const getFeedURL = (urlText) => {
   const urlFeed = new URL(pathAllOrigins);
   urlFeed.searchParams.set('url', urlText);
   urlFeed.searchParams.set('disableCache', 'true');
-//  urlFeed.searchParams.set('charset', 'utf-8');
   return urlFeed.toString();
 }
 
 const processingResponse = (response, watchedState, url, showMessage) => {
-  const { contents, status } = response.data;
-//  console.log('status', status, 'contents', contents);
+  const { contents } = response.data;
 
   const { parsingFeed, parsingPosts } = parsingRSS(contents);
   if (parsingFeed.title === undefined) {
@@ -78,13 +76,10 @@ const processingResponse = (response, watchedState, url, showMessage) => {
 
 const loadByURL = (url, watchedState, showMessage = true) => {
   const allOriginsPath = getFeedURL(url);
-  //console.log(allOriginsPath);
   axios(allOriginsPath).then((response)=> {
-    //console.log('response ',response);
     processingResponse(response, watchedState, url, showMessage);
   })
   .catch(function () {
-    //console.log('url ', allOriginsPath,' network error ',err);
     watchedState.status = 'error.networkError';
   });
 }
@@ -111,7 +106,6 @@ const eventSubmit = (watchedState) => {
   const schemaUrl = yup.string().required().url().trim();
   const urlInput = document.getElementById('url-input');
   const urlPath = urlInput.value;
-  //console.log(urlPath);
   watchedState.status = 'message.validation';
   schemaUrl.validate(urlPath)
   .then(() => {
