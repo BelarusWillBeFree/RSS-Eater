@@ -41,13 +41,9 @@ const getFeedURL = (urlText) => {
 };
 
 const processingResponse = (response, watchedState, url, showMessage) => {
-  const { contents } = response.data;
+  const { data } = response;
 
-  const { parsingFeed, parsingPosts } = parsingRSS(contents);
-  if (parsingFeed.title === undefined) {
-    watchedState.status = 'error.loadError';
-    return;
-  }
+  const { parsingFeed, parsingPosts } = parsingRSS(data, watchedState);
   if (showMessage) {
     watchedState.status = 'message.urlAccess';
   }
@@ -60,8 +56,9 @@ const processingResponse = (response, watchedState, url, showMessage) => {
       description: parsingFeed.description,
     };
     watchedState.feeds.push(savedFeed);
+    watchedState.urlFeeds.push(watchedState.currentURL);
     watchedState.currentURL = undefined;
-    watchedState.id.feed = +1;
+    watchedState.id.feed += 1;
   }
 
   const postsCurrFeed = watchedState.posts.filter((elem) => (elem.idFeed === savedFeed.id));
@@ -70,15 +67,15 @@ const processingResponse = (response, watchedState, url, showMessage) => {
   postsNeedAdd.forEach((item) => {
     item.idFeed = savedFeed.id;
     const idPost = `${savedFeed.id}-${watchedState.id.post}`;
-    watchedState.id.post = +1;
+    watchedState.id.post += 1;
     item.idPost = idPost;
     watchedState.posts.push(item);
   });
 };
 
-const loadByURL = (url, watchedState, showMessage = true) => {
-  const allOriginsPath = getFeedURL(url);
-  axios(allOriginsPath).then((response) => {
+const loadByURL = (watchedState, showMessage = true) => {
+  const url = watchedState.currentURL;
+  axios(watchedState.currentURL).then((response) => {
     processingResponse(response, watchedState, url, showMessage);
   })
     .catch(() => {
@@ -88,8 +85,22 @@ const loadByURL = (url, watchedState, showMessage = true) => {
 
 const updatePostsByInterval = (watchedState, updateInterval) => {
   const { feeds } = watchedState;
-  feeds.forEach((feed) => {
-    loadByURL(feed.url, watchedState, false);
+  const arrPromises = feeds.map((feed) => axios(feed.url)
+    .then((promise) => ({
+      result: 'succes', value: promise,
+    }))
+    .catch((error) => ({
+      result: 'error', error,
+    })));
+  const resultPromise = Promise.all(arrPromises);
+  resultPromise.then((arrResults) => {
+    arrResults.forEach((onePromies) => {
+      if (onePromies.result === 'succes') {
+        processingResponse(onePromies.value, watchedState, onePromies.value.config.url, false);
+      } else {
+        watchedState.status = 'error.networkError';
+      }
+    });
   });
   setTimeout(updatePostsByInterval, updateInterval, watchedState, updateInterval);
 };
@@ -104,22 +115,20 @@ const initViewElements = (watchedState) => {
   watchedState.view.urlInput = document.getElementById('url-input');
 };
 
-const eventSubmit = (watchedState) => {
-  const schemaUrl = yup.string().required().url().trim();
-  const urlInput = document.getElementById('url-input');
-  const urlPath = urlInput.value;
+const addNewFeed = (watchedState) => {
+  const schemaUrl = yup.string().required().url().trim().notOneOf(watchedState.urlFeeds);
+  const urlPath = watchedState.currentURL;
   watchedState.status = 'message.validation';
   schemaUrl.validate(urlPath)
-    .then(() => {
-      if (urlNotSaved(watchedState, urlPath)) {
-        watchedState.currentURL = urlPath;
-        loadByURL(urlPath, watchedState);
-      } else {
+    .then(() => loadByURL(watchedState))
+    .catch((e) => {
+      const { message } = e;
+      const textErr = 'this must not be one of the following values';
+      if (message.search(textErr) !== -1) {
         watchedState.status = 'error.urlAlreadyExist';
+      } else {
+        watchedState.status = 'error.validationError';
       }
-    })
-    .catch(() => {
-      watchedState.status = 'error.validationError';
     });
 };
 
@@ -127,6 +136,7 @@ const main = () => {
   const updateInterval = 5000;
   const state = {
     feeds: [],
+    urlFeeds: [],
     posts: [],
     id: {
       feed: 0,
@@ -142,10 +152,11 @@ const main = () => {
   const watchedState = getWatcher(state);
   initViewElements(watchedState);
   const form = document.querySelector('form[name="form-search"]');
-  setTimeout(updatePostsByInterval, 0, watchedState, updateInterval);
+  updatePostsByInterval(watchedState, updateInterval);
   form.addEventListener('submit', (objEvent) => {
     objEvent.preventDefault();
-    eventSubmit(watchedState);
+    watchedState.currentURL = getFeedURL(objEvent.target[0].value);
+    addNewFeed(watchedState);
   });
 };
 

@@ -13,8 +13,9 @@ const getPostsFromDOM = (items) => {
   return posts;
 };
 
-const parsingRSS = (contents) => {
+const parsingRSS = (inputData, watchedState) => {
   const feed = {};
+  const { contents } = inputData;
   const domParser = new DOMParser().parseFromString(contents, 'application/xml');
 
   const title = domParser.querySelector('title');
@@ -23,6 +24,10 @@ const parsingRSS = (contents) => {
 
   feed.title = title?.textContent;
   feed.description = description?.textContent;
+  if (feed.title === undefined) {
+    watchedState.status = 'error.loadError';
+    return {};
+  }
 
   const posts = getPostsFromDOM(items);
   return { parsingFeed: feed, parsingPosts: posts };

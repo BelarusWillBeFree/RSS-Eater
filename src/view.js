@@ -32,13 +32,26 @@ const refreshFeeds = (state) => {
   feedDiv.innerHTML = '';
   const divCard = document.createElement('div');
   setClassesFromStr(divCard, 'card border-0');
-  divCard.innerHTML = `<div class="card-body"><h2 class="card-title h4">${state.i18n.t('elemets.title_feeds')}</h2></div>`;
+  const cardBody = document.createElement('div');
+  setClassesFromStr(cardBody, 'card-body');
+  const cardTitle = document.createElement('h2');
+  setClassesFromStr(cardTitle, 'card-title h4');
+  cardTitle.innerText = state.i18n.t('elemets.title_feeds');
+  cardBody.append(cardTitle);
+  divCard.append(cardBody);
   const ul = document.createElement('ul');
   feeds.forEach((item) => {
     if (item.title !== undefined) {
       const li = document.createElement('li');
       setClassesFromStr(li, 'list-group-item border-0 border-end-0');
-      li.innerHTML = `<h3 class="h6 m-0">${item.title}</h3> <p class="m-0 small text-black-50">${item.description}</p>`;
+      const h3 = document.createElement('h3');
+      setClassesFromStr(h3, 'h6 m-0');
+      h3.innerText = item.title;
+      li.append(h3);
+      const itemDescrip = document.createElement('p');
+      setClassesFromStr(itemDescrip, 'm-0 small text-black-50');
+      itemDescrip.innerText = item.description;
+      li.append(itemDescrip);
       ul.append(li);
     }
   });
@@ -100,7 +113,14 @@ const refreshPosts = (state) => {
   postsDiv.innerHTML = '';
   const divCard = document.createElement('div');
   setClassesFromStr(divCard, 'card border-0');
-  divCard.innerHTML = `<div class="card-body"><h2 class="card-title h4">${state.i18n.t('elemets.title_posts')}</h2></div>`;
+
+  const cardBody = document.createElement('div');
+  setClassesFromStr(cardBody, 'card-body');
+  const cardTitle = document.createElement('h2');
+  setClassesFromStr(cardTitle, 'card-title h4');
+  cardTitle.innerText = state.i18n.t('elemets.title_posts');
+  cardBody.append(cardTitle);
+  divCard.append(cardBody);
   const ul = document.createElement('ul');
   setClassesFromStr(ul, 'list-group border-0 rounded-0');
   posts.forEach((item) => {
