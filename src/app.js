@@ -7,11 +7,6 @@ import getWatcher from './view.js';
 import resources from './locales/index.js';
 import parsingRSS from './parsingRSS.js';
 
-const urlNotSaved = (watchedState, urlText) => (
-  watchedState.feeds.find((feed) => feed.url === urlText)
-  === undefined
-);
-
 const initI18next = (state) => {
   const defaultLanguage = 'ru';
   const i18nInstance = i18n.createInstance();
@@ -116,7 +111,8 @@ const initViewElements = (watchedState) => {
 };
 
 const addNewFeed = (watchedState) => {
-  const schemaUrl = yup.string().required().url().trim().notOneOf(watchedState.urlFeeds);
+  const schemaUrl = yup.string().required().url().trim()
+    .notOneOf(watchedState.urlFeeds);
   const urlPath = watchedState.currentURL;
   watchedState.status = 'message.validation';
   schemaUrl.validate(urlPath)
