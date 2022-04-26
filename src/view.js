@@ -41,12 +41,14 @@ const refreshFeeds = (state) => {
   divCard.append(cardBody);
   const ul = document.createElement('ul');
   feeds.forEach((item) => {
+    console.log( 'item', item, 'title :', item.title);
     if (item.title !== undefined) {
       const li = document.createElement('li');
       setClassesFromStr(li, 'list-group-item border-0 border-end-0');
       const h3 = document.createElement('h3');
       setClassesFromStr(h3, 'h6 m-0');
       h3.innerText = item.title;
+ 
       li.append(h3);
       const itemDescrip = document.createElement('p');
       setClassesFromStr(itemDescrip, 'm-0 small text-black-50');
@@ -57,6 +59,7 @@ const refreshFeeds = (state) => {
   });
   divCard.append(ul);
   feedDiv.append(divCard);
+  console.log('check name feed:', state.i18n.t('elemets.title_feeds'));
   console.log(feedDiv.innerHTML);
 };
 
