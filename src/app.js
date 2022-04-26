@@ -151,7 +151,8 @@ const main = () => {
   updatePostsByInterval(watchedState, updateInterval);
   form.addEventListener('submit', (objEvent) => {
     objEvent.preventDefault();
-    watchedState.currentURL = getFeedURL(objEvent.target[0].value);
+    const urlInput = document.getElementById('url-input');
+    watchedState.currentURL = getFeedURL(urlInput.value);
     addNewFeed(watchedState);
   });
 };
