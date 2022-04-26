@@ -27,7 +27,7 @@ const initI18next = (state) => {
     });
 };
 
-const getFeedURL = (urlText) => {
+const getAllOriginsURL = (urlText) => {
   const pathAllOrigins = 'https://allorigins.hexlet.app/get';
   const urlFeed = new URL(pathAllOrigins);
   urlFeed.searchParams.set('url', urlText);
@@ -116,7 +116,10 @@ const addNewFeed = (watchedState) => {
   const urlPath = watchedState.currentURL;
   watchedState.status = 'message.validation';
   schemaUrl.validate(urlPath)
-    .then(() => loadByURL(watchedState))
+    .then(() => {
+      watchedState.currentURL = getAllOriginsURL(watchedState.currentURL);
+      loadByURL(watchedState);
+    })
     .catch((e) => {
       const { message } = e;
       const textErr = 'this must not be one of the following values';
@@ -152,7 +155,7 @@ const main = () => {
   form.addEventListener('submit', (objEvent) => {
     objEvent.preventDefault();
     const urlInput = document.getElementById('url-input');
-    watchedState.currentURL = getFeedURL(urlInput.value);
+    watchedState.currentURL = urlInput.value;
     addNewFeed(watchedState);
   });
 };
