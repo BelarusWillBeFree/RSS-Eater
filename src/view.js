@@ -42,20 +42,18 @@ const refreshFeeds = (state) => {
   const ul = document.createElement('ul');
   feeds.forEach((item) => {
     console.log( 'item', item, 'title :', item.title);
-    if (item.title !== undefined) {
-      const li = document.createElement('li');
-      setClassesFromStr(li, 'list-group-item border-0 border-end-0');
-      const h3 = document.createElement('h3');
-      setClassesFromStr(h3, 'h6 m-0');
-      h3.innerText = item.title;
- 
-      li.append(h3);
-      const itemDescrip = document.createElement('p');
-      setClassesFromStr(itemDescrip, 'm-0 small text-black-50');
-      itemDescrip.innerText = item.description;
-      li.append(itemDescrip);
-      ul.append(li);
-    }
+    const li = document.createElement('li');
+    setClassesFromStr(li, 'list-group-item border-0 border-end-0');
+    const h3 = document.createElement('h3');
+    setClassesFromStr(h3, 'h6 m-0');
+    h3.textContent = item.title;
+
+    li.append(h3);
+    const itemDescrip = document.createElement('p');
+    setClassesFromStr(itemDescrip, 'm-0 small text-black-50');
+    itemDescrip.textContent = item.description;
+    li.append(itemDescrip);
+    ul.append(li);
   });
   divCard.append(ul);
   feedDiv.append(divCard);
