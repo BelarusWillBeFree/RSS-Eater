@@ -125,7 +125,7 @@ const addNewFeed = (watchedState) => {
       if (message.search(textErr) !== -1) {
         watchedState.status = 'error.urlAlreadyExist';
       } else {
-        watchedState.status = 'error.validationError';
+        watchedState.status = 'error.loadError';
       }
     });
 };
