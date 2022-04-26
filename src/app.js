@@ -45,7 +45,7 @@ const processingResponse = (response, watchedState, url, showMessage) => {
   let [savedFeed] = watchedState.feeds.filter((feed) => (feed.url === url));
   if (savedFeed === undefined) {
     savedFeed = {
-      url: watchedState.currentURL,
+      url: getAllOriginsURL(watchedState.currentURL),
       id: watchedState.id.feed,
       title: parsingFeed.title,
       description: parsingFeed.description,
@@ -70,7 +70,7 @@ const processingResponse = (response, watchedState, url, showMessage) => {
 
 const loadByURL = (watchedState, showMessage = true) => {
   const url = watchedState.currentURL;
-  axios(watchedState.currentURL).then((response) => {
+  axios(getAllOriginsURL(watchedState.currentURL)).then((response) => {
     processingResponse(response, watchedState, url, showMessage);
   })
     .catch(() => {
@@ -117,7 +117,6 @@ const addNewFeed = (watchedState) => {
   watchedState.status = 'message.validation';
   schemaUrl.validate(urlPath)
     .then(() => {
-      watchedState.currentURL = getAllOriginsURL(watchedState.currentURL);
       loadByURL(watchedState);
     })
     .catch((e) => {
