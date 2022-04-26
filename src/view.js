@@ -27,8 +27,7 @@ const setClassesFromStr = (element, strClass) => {
 };
 
 const refreshFeeds = (state) => {
-  //const { feedDiv } = state.view;
-  const feedDiv = document.querySelector('.feeds');
+  const { feedDiv } = state.view;
   const { feeds } = state;
   feedDiv.innerHTML = '';
   const divCard = document.createElement('div');
@@ -58,6 +57,7 @@ const refreshFeeds = (state) => {
   });
   divCard.append(ul);
   feedDiv.append(divCard);
+  console.log(feedDiv.innerHTML);
 };
 
 const changeColorInLink = (idPost, state) => {
