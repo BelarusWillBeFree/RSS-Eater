@@ -37,13 +37,13 @@ const getAllOriginsURL = (urlText) => {
 
 const processingResponse = (response, watchedState, url, showMessage) => {
   const { data } = response;
-
-  const { parsingFeed, parsingPosts } = parsingRSS(data, watchedState);
   if (showMessage) {
     watchedState.status = 'message.urlAccess';
   }
+
+  const { parsingFeed, parsingPosts } = parsingRSS(data, watchedState);
   let [savedFeed] = watchedState.feeds.filter((feed) => (feed.url === url));
-  if (savedFeed === undefined) {
+  if (savedFeed === undefined && parsingFeed !== undefined) {
     savedFeed = {
       url: getAllOriginsURL(watchedState.currentURL),
       id: watchedState.id.feed,
@@ -125,7 +125,7 @@ const addNewFeed = (watchedState) => {
       if (message.search(textErr) !== -1) {
         watchedState.status = 'error.urlAlreadyExist';
       } else {
-        watchedState.status = 'error.loadError';
+        watchedState.status = 'error.validationError';
       }
     });
 };

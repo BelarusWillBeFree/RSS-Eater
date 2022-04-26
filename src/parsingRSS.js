@@ -21,13 +21,13 @@ const parsingRSS = (inputData, watchedState) => {
   const title = domParser.querySelector('title');
   const description = domParser.querySelector('description');
   const items = domParser.querySelectorAll('item');
-
-  feed.title = title?.textContent;
-  feed.description = description?.textContent;
-  if (feed.title === undefined) {
+  if (title === null) {
     watchedState.status = 'error.loadError';
     return {};
   }
+
+  feed.title = title?.textContent;
+  feed.description = description?.textContent;
 
   const posts = getPostsFromDOM(items);
   return { parsingFeed: feed, parsingPosts: posts };
