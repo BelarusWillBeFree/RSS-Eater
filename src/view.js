@@ -27,7 +27,8 @@ const setClassesFromStr = (element, strClass) => {
 };
 
 const refreshFeeds = (state) => {
-  const { feedDiv } = state.view;
+  //const { feedDiv } = state.view;
+  const feedDiv = document.querySelector('.feeds');
   const { feeds } = state;
   feedDiv.innerHTML = '';
   const divCard = document.createElement('div');
