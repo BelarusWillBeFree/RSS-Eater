@@ -35,54 +35,49 @@ const getAllOriginsURL = (urlText) => {
   return urlFeed.toString();
 };
 
-const processingResponse = (response, watchedState, url, showMessage) => {
-  const { data } = response;
-  if (showMessage) {
-    watchedState.status = 'message.urlAccess';
-  }
+const saveFeed = (parsingFeed, watchedState, url) => {
+  const foundFeed = watchedState.feeds.filter((feed) => (feed.url === url));
+  if (foundFeed.length) return [foundFeed];
+  const newFeed = {
+    url,
+    id: watchedState.id.feed,
+    title: parsingFeed.title,
+    description: parsingFeed.description,
+  };
+  watchedState.feeds.push(newFeed);
+  watchedState.urlFeeds.push(url);
+  watchedState.id.feed += 1;
+  return newFeed;
+};
 
-  const { parsingFeed, parsingPosts } = parsingRSS(data, watchedState);
-  let [savedFeed] = watchedState.feeds.filter((feed) => (feed.url === url));
-  if (savedFeed === undefined && parsingFeed !== undefined) {
-    savedFeed = {
-      url: getAllOriginsURL(watchedState.currentURL),
-      id: watchedState.id.feed,
-      title: parsingFeed.title,
-      description: parsingFeed.description,
-    };
-    watchedState.feeds.push(savedFeed);
-    watchedState.urlFeeds.push(watchedState.currentURL);
-    watchedState.currentURL = undefined;
-    watchedState.id.feed += 1;
-  }
-
-  const postsCurrFeed = watchedState.posts.filter((elem) => (elem.idFeed === savedFeed.id));
+const addNewPosts = (parsingPosts, watchedState, feed) => {
+  const postsCurrFeed = watchedState.posts.filter((elem) => (elem.idFeed === feed.id));
   const postsNeedAdd = _.differenceBy(parsingPosts, postsCurrFeed, 'link');
 
   postsNeedAdd.forEach((item) => {
-    item.idFeed = savedFeed.id;
-    const idPost = `${savedFeed.id}-${watchedState.id.post}`;
+    item.idFeed = feed.id;
+    const idPost = `${feed.id}-${watchedState.id.post}`;
     watchedState.id.post += 1;
     item.idPost = idPost;
     watchedState.posts.push(item);
   });
 };
 
-const loadByURL = (watchedState, showMessage = true) => {
-  const url = watchedState.currentURL;
-  axios(getAllOriginsURL(watchedState.currentURL)).then((response) => {
-    processingResponse(response, watchedState, url, showMessage);
-  })
-    .catch(() => {
-      watchedState.status = 'error.networkError';
-    });
+const processingResponse = (response, watchedState, url) => {
+  const { data } = response;
+
+  const { parsingFeed, parsingPosts } = parsingRSS(data, watchedState);
+  if (parsingFeed === undefined) return;
+
+  const feed = saveFeed(parsingFeed, watchedState, url);
+  addNewPosts(parsingPosts, watchedState, feed);
 };
 
 const updatePostsByInterval = (watchedState, updateInterval) => {
   const { feeds } = watchedState;
-  const arrPromises = feeds.map((feed) => axios(feed.url)
+  const arrPromises = feeds.map((feed) => axios(getAllOriginsURL(feed.url))
     .then((promise) => ({
-      result: 'succes', value: promise,
+      result: 'succes', value: promise, url: feed.url,
     }))
     .catch((error) => ({
       result: 'error', error,
@@ -91,13 +86,15 @@ const updatePostsByInterval = (watchedState, updateInterval) => {
   resultPromise.then((arrResults) => {
     arrResults.forEach((onePromies) => {
       if (onePromies.result === 'succes') {
-        processingResponse(onePromies.value, watchedState, onePromies.value.config.url, false);
+        processingResponse(onePromies.value, watchedState, onePromies.url);
       } else {
-        watchedState.status = 'error.networkError';
+        watchedState.status = 'networkError';
+        watchedState.view.message = 'error.networkError';
       }
     });
+  }).finally(() => {
+    setTimeout(updatePostsByInterval, updateInterval, watchedState, updateInterval);
   });
-  setTimeout(updatePostsByInterval, updateInterval, watchedState, updateInterval);
 };
 
 const initViewElements = (watchedState) => {
@@ -110,22 +107,30 @@ const initViewElements = (watchedState) => {
   watchedState.view.urlInput = document.getElementById('url-input');
 };
 
-const addNewFeed = (watchedState) => {
+const appendFeed = (watchedState, urlPath) => {
   const schemaUrl = yup.string().required().url().trim()
     .notOneOf(watchedState.urlFeeds);
-  const urlPath = watchedState.currentURL;
-  watchedState.status = 'message.validation';
+  watchedState.status = 'validation';
+  watchedState.view.message = 'message.validation';
   schemaUrl.validate(urlPath)
     .then(() => {
-      loadByURL(watchedState);
+      axios(getAllOriginsURL(urlPath)).then((response) => {
+        watchedState.status = 'urlAccess';
+        watchedState.view.message = 'message.urlAccess';
+        processingResponse(response, watchedState, urlPath);
+      })
+        .catch(() => {
+          watchedState.status = 'networkError';
+          watchedState.view.message = 'error.networkError';
+        });
     })
     .catch((e) => {
-      const { message } = e;
-      const textErr = 'this must not be one of the following values';
-      if (message.search(textErr) !== -1) {
-        watchedState.status = 'error.urlAlreadyExist';
+      if (e.type === 'notOneOf') {
+        watchedState.status = 'urlAlreadyExist';
+        watchedState.view.message = 'error.urlAlreadyExist';
       } else {
-        watchedState.status = 'error.validationError';
+        watchedState.status = 'validationError';
+        watchedState.view.message = 'error.validationError';
       }
     });
 };
@@ -140,10 +145,10 @@ const main = () => {
       feed: 0,
       post: 0,
     },
-    currentURL: undefined,
     status: 'waitEnterURL',
     view: {
       viewedPosts: [],
+      message: '',
     },
   };
   initI18next(state);
@@ -154,8 +159,7 @@ const main = () => {
   form.addEventListener('submit', (objEvent) => {
     objEvent.preventDefault();
     const urlInput = document.getElementById('url-input');
-    watchedState.currentURL = urlInput.value;
-    addNewFeed(watchedState);
+    appendFeed(watchedState, urlInput.value);
   });
 };
 

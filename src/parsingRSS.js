@@ -18,16 +18,15 @@ const parsingRSS = (inputData, watchedState) => {
   const { contents } = inputData;
   const domParser = new DOMParser().parseFromString(contents, 'application/xml');
 
-  const title = domParser.querySelector('title');
-  const description = domParser.querySelector('description');
-  const items = domParser.querySelectorAll('item');
-  if (title === null) {
-    watchedState.status = 'error.loadError';
+  if (domParser.querySelector('parsererror') !== null) {
+    watchedState.status = 'loadError';
+    watchedState.view.message = 'error.loadError';
     return {};
   }
 
-  feed.title = title?.textContent;
-  feed.description = description?.textContent;
+  feed.title = domParser.querySelector('title').textContent;
+  feed.description = domParser.querySelector('description').textContent;
+  const items = domParser.querySelectorAll('item');
 
   const posts = getPostsFromDOM(items);
   return { parsingFeed: feed, parsingPosts: posts };

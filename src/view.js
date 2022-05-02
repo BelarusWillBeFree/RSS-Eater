@@ -10,14 +10,13 @@ const blockInputElements = (state, disabled = false) => {
   }
 };
 const showFeedBack = (state) => {
-  const { feedback } = state.view;
-  const { status } = state;
-  const [typeStatus] = status.split('.');
+  const { feedback, message } = state.view;
+  const [typeMessage] = message.split('.');
   feedback.classList.remove('text-success');
   feedback.classList.remove('text-danger');
-  feedback.classList.add(`text-${typeStatus === 'error' ? 'danger' : 'success'}`);
-  if (typeStatus === 'error') blockInputElements(state, false);
-  feedback.textContent = state.i18n.t(status);
+  feedback.classList.add(`text-${typeMessage === 'error' ? 'danger' : 'success'}`);
+  if (typeMessage === 'error') blockInputElements(state, false);
+  feedback.textContent = state.i18n.t(message);
 };
 
 const setClassesFromStr = (element, strClass) => {
@@ -139,7 +138,9 @@ const refreshPosts = (state) => {
 export default (state) => onChange(state, (path, value) => {
   switch (path) {
     case 'status':
-      if (value === 'message.validation') blockInputElements(state, true);
+      if (value === 'validation') blockInputElements(state, true);
+      break;
+    case 'view.message':
       showFeedBack(state);
       break;
     case 'feeds':
