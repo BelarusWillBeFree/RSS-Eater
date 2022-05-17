@@ -136,7 +136,8 @@ const validateError = (e, watchedState) => {
 };
 
 const validateUrl = (url, watchedState) => {
-  const schemaUrl = yup.string().required().url().trim().notOneOf(watchedState.urlFeeds);
+  const schemaUrl = yup.string().required().url().trim()
+    .notOneOf(watchedState.urlFeeds);
   watchedState.status = 'validation';
   watchedState.view.message = 'message.validation';
   schemaUrl.validate(url)

@@ -1,5 +1,6 @@
 ---
 
+
 env:
   jest: true
   browser: true
@@ -10,6 +11,7 @@ extends:
 
 parserOptions:
   ecmaVersion: latest
+
 
 rules:
   import/extensions: 0
