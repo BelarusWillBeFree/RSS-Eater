@@ -19,9 +19,9 @@ const parsingRSS = (inputData, watchedState) => {
   const domParser = new DOMParser().parseFromString(contents, 'application/xml');
 
   if (domParser.querySelector('parsererror') !== null) {
-    watchedState.status = 'loadError';
-    watchedState.view.message = 'error.loadError';
-    return {};
+    watchedState.form.status = 'loadingError';
+    watchedState.form.error = 'error.loadingError';
+    throw new Error();
   }
 
   feed.title = domParser.querySelector('title').textContent;

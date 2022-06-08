@@ -1,22 +1,25 @@
 import onChange from 'on-change';
 
 const blockInputElements = (state, disabled = false) => {
+  const buttonSubmit = document.getElementById('submit');
+  const urlInput = document.getElementById('url-input');
   if (disabled) {
-    state.view.buttonSubmit.setAttribute('disabled', 'disabled');
-    state.view.urlInput.setAttribute('readonly', 'true');
+    buttonSubmit.setAttribute('disabled', 'disabled');
+    urlInput.setAttribute('readonly', 'true');
   } else {
-    state.view.buttonSubmit.removeAttribute('disabled');
-    state.view.urlInput.removeAttribute('readonly');
+    buttonSubmit.removeAttribute('disabled');
+    urlInput.removeAttribute('readonly');
   }
 };
 const showFeedBack = (state) => {
-  const { feedback, message } = state.view;
-  const [typeMessage] = message.split('.');
+  const feedback = document.querySelector('.feedback');
+  const { error } = state.form;
+  const [typeMessage] = error.split('.');
   feedback.classList.remove('text-success');
   feedback.classList.remove('text-danger');
   feedback.classList.add(`text-${typeMessage === 'error' ? 'danger' : 'success'}`);
   if (typeMessage === 'error') blockInputElements(state, false);
-  feedback.textContent = state.i18n.t(message);
+  feedback.textContent = state.i18n.t(error);
 };
 
 const setClassesFromStr = (element, strClass) => {
@@ -26,7 +29,7 @@ const setClassesFromStr = (element, strClass) => {
 };
 
 const refreshFeeds = (state) => {
-  const { feedDiv } = state.view;
+  const feedDiv = document.querySelector('.feeds');
   const { feeds } = state;
   feedDiv.innerHTML = '';
   const divCard = document.createElement('div');
@@ -58,9 +61,9 @@ const refreshFeeds = (state) => {
 };
 
 const changeColorInLink = (idPost, state) => {
-  const needAddIdPost = state.view.viewedPosts.filter((elem) => elem === idPost).length === 0;
+  const needAddIdPost = state.viewedPosts.filter((elem) => elem === idPost).length === 0;
   if (needAddIdPost) {
-    state.view.viewedPosts.push(idPost);
+    state.viewedPosts.push(idPost);
     const linkChangeColor = document.querySelector(`a[data-post-id="${idPost}"]`);
     linkChangeColor.classList.remove('fw-bold');
     linkChangeColor.classList.add('fw-normal');
@@ -73,7 +76,7 @@ const addNewLink = (item, state) => {
   link.setAttribute('rel', 'noopener noreferrer');
   link.setAttribute('target', '_blank');
   link.setAttribute('data-post-id', item.idPost);
-  const linkViewed = state.view.viewedPosts.filter((elem) => elem === item.idPost).length > 0;
+  const linkViewed = state.viewedPosts.filter((elem) => elem === item.idPost).length > 0;
   setClassesFromStr(link, linkViewed ? 'fw-normal' : 'fw-bold');
   link.textContent = item.title;
   link.addEventListener('click', (objEvent) => {
@@ -93,7 +96,7 @@ const addNewButton = (item, state) => {
   button.addEventListener('click', (objEvent) => {
     const idPost = objEvent.target.getAttribute('data-post-id');
     const [filteredPost] = state.posts.filter((post) => (post.idPost === idPost));
-    const { modal } = state.view;
+    const modal = document.getElementById('modal');
     const title = modal.querySelector('.modal-title');
     title.textContent = filteredPost.title;
     const body = modal.querySelector('.modal-body');
@@ -106,7 +109,7 @@ const addNewButton = (item, state) => {
 };
 
 const refreshPosts = (state) => {
-  const { postsDiv } = state.view;
+  const postsDiv = document.querySelector('.posts');
   const { posts } = state;
   postsDiv.innerHTML = '';
   const divCard = document.createElement('div');
@@ -136,16 +139,17 @@ const refreshPosts = (state) => {
 };
 
 export default (state) => onChange(state, (path, value) => {
+  const urlInput = document.getElementById('url-input');
   switch (path) {
-    case 'status':
+    case 'form.status':
       if (value === 'validation') blockInputElements(state, true);
       break;
-    case 'view.message':
+    case 'form.error':
       showFeedBack(state);
       break;
     case 'feeds':
-      state.view.urlInput.value = '';
-      state.view.urlInput.focus();
+      urlInput.value = '';
+      urlInput.focus();
       blockInputElements(state, false);
       refreshFeeds(state);
       refreshPosts(state);

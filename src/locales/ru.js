@@ -6,14 +6,14 @@ export default {
       title_feeds: 'Фиды',
     },
     message: {
-      urlAccess: 'RSS успешно загружен',
+      uploadedSuccessfully: 'RSS успешно загружен',
       validation: 'выполняется валидация URL',
       downloadData: 'загрузка данных',
     },
     error: {
       urlAlreadyExist: 'RSS уже существует',
       validationError: 'Ссылка должна быть валидным URL',
-      loadError: 'Ресурс не содержит валидный RSS',
+      loadingError: 'Ресурс не содержит валидный RSS',
       networkError: 'Ошибка сети',
     },
   },
