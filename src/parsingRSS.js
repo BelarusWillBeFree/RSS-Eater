@@ -15,10 +15,10 @@ const getPostsFromDOM = (items) => {
 
 const parsingRSS = (inputData, watchedState) => {
   const feed = {};
-  const { contents } = inputData;
+  const { contents, status } = inputData;
   const domParser = new DOMParser().parseFromString(contents, 'application/xml');
 
-  if (domParser.querySelector('parsererror') !== null) {
+  if (status.http_code !== 200 || domParser.querySelector('parsererror') !== null) {
     watchedState.form.status = 'loadingError';
     watchedState.form.error = 'error.loadingError';
     throw new Error();

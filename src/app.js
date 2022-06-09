@@ -72,9 +72,13 @@ const saveFeedAndPosts = (response, watchedState, url) => {
 
 const updatePosts = (response, watchedState, feed) => {
   const { data } = response;
-
-  const { parsingPosts } = parsingRSS(data, watchedState);
-  addOnlyNewPosts(parsingPosts, watchedState, feed);
+  try {
+    const { parsingPosts } = parsingRSS(data, watchedState);
+    addOnlyNewPosts(parsingPosts, watchedState, feed);
+  } catch {
+    watchedState.form.status = 'loadingError';
+    watchedState.form.error = 'error.loadingError';
+  }
 };
 
 const getFeedPromise = (watchedState, feed) => (
