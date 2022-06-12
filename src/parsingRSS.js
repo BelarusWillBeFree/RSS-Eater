@@ -15,7 +15,7 @@ const getPostsFromDOM = (items) => {
 
 const parsingRSS = (inputData, watchedState) => {
   const feed = {};
-  const { contents } = inputData;//status.http_code !== 200 ||
+  const { contents } = inputData;
   const domParser = new DOMParser().parseFromString(contents, 'application/xml');
 
   if (domParser.querySelector('parsererror')) {
