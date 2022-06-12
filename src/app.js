@@ -59,15 +59,17 @@ const addOnlyNewPosts = (parsingPosts, watchedState, feed) => {
 
 const saveFeedAndPosts = (response, watchedState, url) => {
   const { data } = response;
-
-  const { parsingFeed, parsingPosts } = parsingRSS(data, watchedState);
-
-  const newFeed = createNewFeed(parsingFeed, watchedState, url);
-  watchedState.feeds.push(newFeed);
-  watchedState.urlFeeds.push(url);
-  watchedState.nextIdFeed += 1;
-
-  addOnlyNewPosts(parsingPosts, watchedState, newFeed);
+  try {
+    const { parsingFeed, parsingPosts } = parsingRSS(data, watchedState);
+    const newFeed = createNewFeed(parsingFeed, watchedState, url);
+    watchedState.feeds.push(newFeed);
+    watchedState.urlFeeds.push(url);
+    watchedState.nextIdFeed += 1;
+    addOnlyNewPosts(parsingPosts, watchedState, newFeed);
+  } catch {
+    watchedState.form.status = 'loadingError';
+    watchedState.form.error = 'error.loadingError';
+  }
 };
 
 const updatePosts = (response, watchedState, feed) => {

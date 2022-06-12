@@ -2,13 +2,16 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 make: *** No rule to make target 'all'.  Stop.
 
 # GNU Make 4.2.1
+ 
 # Built for x86_64-pc-linux-gnu
+ 
 # Copyright (C) 1988-2016 Free Software Foundation, Inc.
+ 
 # License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Wed Jun  8 21:13:45 2022
+# Make data base, printed on Sun Jun 12 10:02:32 2022
 
 # Variables
 
@@ -41,7 +44,7 @@ IM_CONFIG_PHASE = 1
 # automatic
 @D = $(patsubst %/,%,$(dir $@))
 # environment
-XAUTHORITY = /run/user/1000/.mutter-Xwaylandauth.5K2YM1
+XAUTHORITY = /run/user/1000/.mutter-Xwaylandauth.HT9YN1
 # environment
 GDMSESSION = ubuntu-wayland
 # environment
@@ -51,11 +54,11 @@ CURDIR := /home/anatoli/js/frontend-project-lvl3/frontend-project-lvl3
 # makefile
 SHELL = /bin/sh
 # environment
-SNAP_DATA = /var/snap/code/97
+SNAP_DATA = /var/snap/code/98
 # environment
 VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_languagePackSupport":true}
 # environment
-JOURNAL_STREAM = 8:39926
+JOURNAL_STREAM = 8:40437
 # environment
 XDG_CONFIG_DIRS = /etc/xdg/xdg-ubuntu-wayland:/etc/xdg
 # environment
@@ -79,9 +82,9 @@ DBUS_SESSION_BUS_ADDRESS = unix:path=/run/user/1000/bus
 # environment
 VSCODE_VERBOSE_LOGGING = true
 # environment
-_ = /snap/code/97/usr/share/code/code
+_ = /snap/code/98/usr/share/code/code
 # environment
-MANAGERPID = 2284
+MANAGERPID = 2335
 # environment
 LESSOPEN = | /usr/bin/lesspipe %s
 # environment
@@ -89,23 +92,23 @@ LC_NAME = be_BY.UTF-8
 # environment
 VSCODE_CWD = /home/anatoli
 # environment
-GSETTINGS_SCHEMA_DIR = /snap/code/97/usr/share/glib-2.0/schemas
+GSETTINGS_SCHEMA_DIR = /snap/code/98/usr/share/glib-2.0/schemas
 # default
 MAKE_HOST := x86_64-pc-linux-gnu
 # environment
 PATH = /home/anatoli/.nvm/versions/node/v16.8.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
 # environment
-SESSION_MANAGER = local/anatoli-ubuntu:@/tmp/.ICE-unix/2394,unix/anatoli-ubuntu:/tmp/.ICE-unix/2394
+SESSION_MANAGER = local/anatoli-ubuntu:@/tmp/.ICE-unix/2436,unix/anatoli-ubuntu:/tmp/.ICE-unix/2436
 # environment
 XDG_RUNTIME_DIR = /run/user/1000
 # environment
 SSH_AGENT_LAUNCHER = gnome-keyring
 # environment
-SNAP = /snap/code/97
+SNAP = /snap/code/98
 # environment
 NVM_BIN = /home/anatoli/.nvm/versions/node/v16.8.0/bin
 # environment
-SNAP_VERSION = c3511e6c
+SNAP_VERSION = 4af164ea
 # environment
 XDG_MENU_PREFIX = gnome-
 # environment
@@ -115,9 +118,9 @@ DISABLE_WAYLAND = 1
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # environment
-INVOCATION_ID = 4d1e7ae677714cfdaea917321e9a989d
+INVOCATION_ID = 95fc9028a1fe48479ddb16885992f1fe
 # environment
-GDK_PIXBUF_MODULEDIR = /snap/code/97/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders
+GDK_PIXBUF_MODULEDIR = /snap/code/98/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders
 # default
 .FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell archives jobserver output-sync check-symlink load
 # environment
@@ -127,7 +130,7 @@ XDG_SESSION_DESKTOP = ubuntu-wayland
 # environment
 SSH_AUTH_SOCK = /run/user/1000/keyring/ssh
 # environment
-GIO_LAUNCHED_DESKTOP_FILE_PID = 46599
+GIO_LAUNCHED_DESKTOP_FILE_PID = 5705
 # automatic
 %F = $(notdir $%)
 # environment
@@ -155,7 +158,7 @@ LESSCLOSE = /usr/bin/lesspipe %s %s
 # environment
 VSCODE_CLI = 1
 # environment
-VSCODE_CODE_CACHE_PATH = /home/anatoli/.config/Code/CachedData/c3511e6c69bb39013c4a4b7b9566ec1ca73fc4d5
+VSCODE_CODE_CACHE_PATH = /home/anatoli/.config/Code/CachedData/4af164ea3a06f701fe3e89a2bcbb421d2026b68f
 # environment
 LOGNAME = anatoli
 # environment
@@ -189,19 +192,19 @@ MAKECMDGOALS := all
 # environment
 QT_IM_MODULE = ibus
 # environment
-SNAP_USER_DATA = /home/anatoli/snap/code/97
+SNAP_USER_DATA = /home/anatoli/snap/code/98
 # environment
 SHLVL = 0
 # environment
 GNOME_SHELL_SESSION_MODE = ubuntu
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-cc49f299-e5cc-4bad-b9e0-09a7070b16cd.sock
+VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-a306a7d5-68a0-47d5-aaba-c4550d5ed3a3.sock
 # default
 MAKE_VERSION := 4.2.1
 # environment
 USER = anatoli
 # environment
-SNAP_REVISION = 97
+SNAP_REVISION = 98
 # environment
 LC_MONETARY = be_BY.UTF-8
 # makefile
@@ -219,7 +222,7 @@ MAKE_COMMAND := make
 # automatic
 *F = $(notdir $*)
 # environment
-VSCODE_IPC_HOOK = /run/user/1000/vscode-4d4edf4a-1.67.2-main.sock
+VSCODE_IPC_HOOK = /run/user/1000/vscode-4d4edf4a-1.68.0-main.sock
 # environment
 BAMF_DESKTOP_FILE_HINT = /var/lib/snapd/desktop/applications/code_code.desktop
 # makefile
@@ -279,12 +282,13 @@ LC_ADDRESS = be_BY.UTF-8
 # environment
 LANG = C
 # environment
-VSCODE_PID = 46640
- 
+VSCODE_PID = 5749
 # variable set hash-table stats:
 # Load=134/1024=13%, Rehash=0, Collisions=24/159=15%
 
+ 
 # Pattern-specific Variable Values
+ 
 
 # No pattern-specific variable values.
 
@@ -376,6 +380,6 @@ install:
 # strcache performance: lookups = 39 / hit rate = 28%
 # hash-table stats:
 # Load=28/8192=0%, Rehash=0, Collisions=1/39=3%
-# Finished Make data base on Wed Jun  8 21:13:45 2022
+# Finished Make data base on Sun Jun 12 10:02:32 2022
 
  
