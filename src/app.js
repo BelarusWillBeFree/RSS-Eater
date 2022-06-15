@@ -69,7 +69,7 @@ const updateFeeds = (watchedState, updateInterval) => {
   const resultPromise = Promise.all(feedsPromises);
 
   resultPromise.finally(() => {
-    setTimeout(updatePostsByInterval, updateInterval, watchedState, updateInterval);
+    setTimeout(updateFeeds, updateInterval, watchedState, updateInterval);
   });
 };
 
