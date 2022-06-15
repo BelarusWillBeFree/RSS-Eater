@@ -1,16 +1,16 @@
 import onChange from 'on-change';
 
 const blockInputElements = (state, disabled = false) => {
-  const buttonSubmit = document.getElementById('submit');
-  const urlInput = document.getElementById('url-input');
+  const { submitButton, urlInput } = state.elements;
   if (disabled) {
-    buttonSubmit.setAttribute('disabled', 'disabled');
+    submitButton.setAttribute('disabled', 'disabled');
     urlInput.setAttribute('readonly', 'true');
   } else {
-    buttonSubmit.removeAttribute('disabled');
+    submitButton.removeAttribute('disabled');
     urlInput.removeAttribute('readonly');
   }
 };
+
 const showFeedBack = (state) => {
   const feedback = document.querySelector('.feedback');
   const { error } = state.form;
@@ -139,7 +139,7 @@ const refreshPosts = (state) => {
 };
 
 export default (state) => onChange(state, (path, value) => {
-  const urlInput = document.getElementById('url-input');
+  const { urlInput } = state.elements;
   switch (path) {
     case 'form.status':
       if (value === 'validation') blockInputElements(state, true);

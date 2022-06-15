@@ -16,17 +16,17 @@ const getPostsFromDOM = (items) => {
 const parsingRSS = (inputData, watchedState) => {
   const feed = {};
   const { contents } = inputData;
-  const domParser = new DOMParser().parseFromString(contents, 'application/xml');
+  const rssContent = new DOMParser().parseFromString(contents, 'application/xml');
 
-  if (domParser.querySelector('parsererror')) {
-    watchedState.form.status = 'loadingError';
-    watchedState.form.error = 'error.loadingError';
+  if (rssContent.querySelector('parsererror')) {
+    watchedState.form.status = 'parsingError';
+    watchedState.form.error = 'error.parsingError';
     throw new Error();
   }
 
-  feed.title = domParser.querySelector('title').textContent;
-  feed.description = domParser.querySelector('description').textContent;
-  const items = domParser.querySelectorAll('item');
+  feed.title = rssContent.querySelector('title').textContent;
+  feed.description = rssContent.querySelector('description').textContent;
+  const items = rssContent.querySelectorAll('item');
 
   const posts = getPostsFromDOM(items);
   return { parsingFeed: feed, parsingPosts: posts };

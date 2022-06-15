@@ -35,85 +35,42 @@ const getAllOriginsURL = (urlText) => {
   return urlFeed.toString();
 };
 
-const createNewFeed = (parsingFeed, watchedState, url) => {
-  const newFeed = {
-    url,
-    id: watchedState.nextIdFeed,
-    title: parsingFeed.title,
-    description: parsingFeed.description,
-  };
-  return newFeed;
-};
-
 const addOnlyNewPosts = (parsingPosts, watchedState, feed) => {
   const savedPosts = watchedState.posts.filter((elem) => (elem.idFeed === feed.id));
   const postsNeedAdd = _.differenceBy(parsingPosts, savedPosts, 'link');
 
   postsNeedAdd.forEach((item) => {
     item.idFeed = feed.id;
-    item.idPost = `${feed.id}-${watchedState.nextIdPost}`;
-    watchedState.nextIdPost += 1;
+    item.idPost = `${feed.id}-${_.uniqueId()}`;
     watchedState.posts.push(item);
   });
 };
 
-const saveFeedAndPosts = (response, watchedState, url) => {
-  const { data } = response;
-  try {
-    const { parsingFeed, parsingPosts } = parsingRSS(data, watchedState);
-    const newFeed = createNewFeed(parsingFeed, watchedState, url);
-    watchedState.feeds.push(newFeed);
-    watchedState.urlFeeds.push(url);
-    watchedState.nextIdFeed += 1;
-    addOnlyNewPosts(parsingPosts, watchedState, newFeed);
-  } catch {
-    watchedState.form.status = 'loadingError';
-    watchedState.form.error = 'error.loadingError';
-  }
-};
-
-const updatePosts = (response, watchedState, feed) => {
-  const { data } = response;
-  try {
-    const { parsingPosts } = parsingRSS(data, watchedState);
-    addOnlyNewPosts(parsingPosts, watchedState, feed);
-  } catch {
-    watchedState.form.status = 'loadingError';
-    watchedState.form.error = 'error.loadingError';
-  }
-};
-
-const getFeedPromise = (watchedState, feed) => (
-  axios(getAllOriginsURL(feed.url))
-    .then((promise) => updatePosts(promise, watchedState, feed))
-    .catch(() => {
-      watchedState.status = 'networkError';
-      watchedState.view.message = 'error.networkError';
-    })
-);
-
-const updatePostsByInterval = (watchedState, updateInterval) => {
+const updateFeeds = (watchedState, updateInterval) => {
   const { feeds } = watchedState;
-  const feedsPromises = feeds.map((feed) => getFeedPromise(watchedState, feed));
+  const feedsPromises = feeds.map((feed) => (
+    axios(getAllOriginsURL(feed.url))
+      .then((promise) => {
+        const { data } = promise;
+        try {
+          const { parsingPosts } = parsingRSS(data, watchedState);
+          addOnlyNewPosts(parsingPosts, watchedState, feed);
+        } catch {
+          watchedState.form.status = 'parsingError';
+          watchedState.form.error = 'error.parsingError';
+        }
+      })
+      .catch(() => {
+        watchedState.status = 'networkError';
+        watchedState.view.message = 'error.networkError';
+      })
+  ));
 
   const resultPromise = Promise.all(feedsPromises);
 
   resultPromise.finally(() => {
     setTimeout(updatePostsByInterval, updateInterval, watchedState, updateInterval);
   });
-};
-
-const requestByURL = (url, watchedState) => {
-  const allOriginsURL = getAllOriginsURL(url);
-  axios(allOriginsURL).then((response) => {
-    watchedState.form.status = 'uploadedSuccessfully';
-    watchedState.form.error = 'message.uploadedSuccessfully';
-    saveFeedAndPosts(response, watchedState, url);
-  })
-    .catch(() => {
-      watchedState.form.status = 'networkError';
-      watchedState.form.error = 'error.networkError';
-    });
 };
 
 const validateError = (e, watchedState) => {
@@ -126,13 +83,39 @@ const validateError = (e, watchedState) => {
   }
 };
 
-const validateUrl = (url, watchedState) => {
+const loadFeed = (url, watchedState) => {
   const schemaUrl = yup.string().required().url().trim()
     .notOneOf(watchedState.urlFeeds);
   watchedState.form.status = 'validation';
   watchedState.form.error = 'message.validation';
   schemaUrl.validate(url)
-    .then(() => requestByURL(url, watchedState))
+    .then(() => {
+      const allOriginsURL = getAllOriginsURL(url);
+      axios(allOriginsURL).then((response) => {
+        watchedState.form.status = 'uploadedSuccessfully';
+        watchedState.form.error = 'message.uploadedSuccessfully';
+        const { data } = response;
+        try {
+          const { parsingFeed, parsingPosts } = parsingRSS(data, watchedState);
+          const newFeed = {
+            url,
+            id: _.uniqueId(),
+            title: parsingFeed.title,
+            description: parsingFeed.description,
+          };
+          watchedState.feeds.push(newFeed);
+          watchedState.urlFeeds.push(url);
+          addOnlyNewPosts(parsingPosts, watchedState, newFeed);
+        } catch {
+          watchedState.form.status = 'parsingError';
+          watchedState.form.error = 'error.parsingError';
+        }
+      })
+        .catch(() => {
+          watchedState.form.status = 'networkError';
+          watchedState.form.error = 'error.networkError';
+        });
+    })
     .catch((e) => validateError(e, watchedState));
 };
 
@@ -148,17 +131,20 @@ const main = () => {
       status: 'waitEnterURL',
       error: '',
     },
+    elements: {},
     viewedPosts: [],
   };
   initI18next(state);
   const watchedState = getWatcher(state);
   const form = document.querySelector('form[name="form-search"]');
-  updatePostsByInterval(watchedState, updateInterval);
+  state.elements.urlInput = document.getElementById('url-input');
+  state.elements.modal = document.getElementById('modal');
+  state.elements.submitButton = document.getElementById('submit');
+  updateFeeds(watchedState, updateInterval);
   form.addEventListener('submit', (objEvent) => {
     objEvent.preventDefault();
-    const urlInput = document.getElementById('url-input');
-    const url = urlInput.value;
-    validateUrl(url, watchedState);
+    const url = state.elements.urlInput.value;
+    loadFeed(url, watchedState);
   });
 };
 

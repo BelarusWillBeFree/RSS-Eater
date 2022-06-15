@@ -13,7 +13,7 @@ export default {
     error: {
       urlAlreadyExist: 'RSS уже существует',
       validationError: 'Ссылка должна быть валидным URL',
-      loadingError: 'Ресурс не содержит валидный RSS',
+      parsingError: 'Ресурс не содержит валидный RSS',
       networkError: 'Ошибка сети',
     },
   },
