@@ -15,13 +15,13 @@ const getPostsFromDOM = (items) => {
 
 const parsingRSS = (inputData, watchedState) => {
   const feed = {};
-  const { contents } = inputData;
+  const { contents } = inputData.data;
   const rssContent = new DOMParser().parseFromString(contents, 'application/xml');
 
   if (rssContent.querySelector('parsererror')) {
     watchedState.form.status = 'parsingError';
-    watchedState.form.error = 'error.parsingError';
-    throw new Error();
+    watchedState.form.information = 'error.parsingError';
+    throw new Error('parsingError');
   }
 
   feed.title = rssContent.querySelector('title').textContent;

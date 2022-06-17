@@ -51,18 +51,17 @@ const updateFeeds = (watchedState, updateInterval) => {
   const feedsPromises = feeds.map((feed) => (
     axios(getAllOriginsURL(feed.url))
       .then((promise) => {
-        const { data } = promise;
         try {
-          const { parsingPosts } = parsingRSS(data, watchedState);
+          const { parsingPosts } = parsingRSS(promise, watchedState);
           addOnlyNewPosts(parsingPosts, watchedState, feed);
         } catch {
           watchedState.form.status = 'parsingError';
-          watchedState.form.error = 'error.parsingError';
+          watchedState.form.information = 'error.parsingError';
         }
       })
       .catch(() => {
         watchedState.status = 'networkError';
-        watchedState.view.message = 'error.networkError';
+        watchedState.view.information = 'error.networkError';
       })
   ));
 
@@ -76,44 +75,38 @@ const updateFeeds = (watchedState, updateInterval) => {
 const validateError = (e, watchedState) => {
   if (e.type === 'notOneOf') {
     watchedState.form.status = 'urlAlreadyExist';
-    watchedState.form.error = 'error.urlAlreadyExist';
+    watchedState.form.information = 'error.urlAlreadyExist';
   } else {
     watchedState.form.status = 'validationError';
-    watchedState.form.error = 'error.validationError';
+    watchedState.form.information = 'error.validationError';
   }
 };
 
 const loadFeed = (url, watchedState) => {
   const schemaUrl = yup.string().required().url().trim()
     .notOneOf(watchedState.urlFeeds);
-  watchedState.form.status = 'validation';
-  watchedState.form.error = 'message.validation';
   schemaUrl.validate(url)
     .then(() => {
+      watchedState.form.status = 'validation';
       const allOriginsURL = getAllOriginsURL(url);
       axios(allOriginsURL).then((response) => {
+        const { parsingFeed, parsingPosts } = parsingRSS(response, watchedState);
+        const newFeed = {
+          url,
+          id: _.uniqueId(),
+          title: parsingFeed.title,
+          description: parsingFeed.description,
+        };
+        watchedState.feeds.push(newFeed);
+        watchedState.urlFeeds.push(url);
+        addOnlyNewPosts(parsingPosts, watchedState, newFeed);
         watchedState.form.status = 'uploadedSuccessfully';
-        watchedState.form.error = 'message.uploadedSuccessfully';
-        const { data } = response;
-        try {
-          const { parsingFeed, parsingPosts } = parsingRSS(data, watchedState);
-          const newFeed = {
-            url,
-            id: _.uniqueId(),
-            title: parsingFeed.title,
-            description: parsingFeed.description,
-          };
-          watchedState.feeds.push(newFeed);
-          watchedState.urlFeeds.push(url);
-          addOnlyNewPosts(parsingPosts, watchedState, newFeed);
-        } catch {
-          watchedState.form.status = 'parsingError';
-          watchedState.form.error = 'error.parsingError';
-        }
+        watchedState.form.information = 'message.uploadedSuccessfully';
       })
-        .catch(() => {
-          watchedState.form.status = 'networkError';
-          watchedState.form.error = 'error.networkError';
+        .catch((err) => {
+          const nameErrorForState = err.message === 'Network Error' ? 'networkError' : err.message;
+          watchedState.form.status = nameErrorForState;
+          watchedState.form.information = `error.${nameErrorForState}`;
         });
     })
     .catch((e) => validateError(e, watchedState));
@@ -125,25 +118,20 @@ const main = () => {
     feeds: [],
     urlFeeds: [],
     posts: [],
-    nextIdFeed: 0,
-    nextIdPost: 0,
     form: {
       status: 'waitEnterURL',
-      error: '',
+      information: '',
     },
-    elements: {},
     viewedPosts: [],
   };
   initI18next(state);
   const watchedState = getWatcher(state);
   const form = document.querySelector('form[name="form-search"]');
-  state.elements.urlInput = document.getElementById('url-input');
-  state.elements.modal = document.getElementById('modal');
-  state.elements.submitButton = document.getElementById('submit');
+  const urlInput = document.getElementById('url-input');
   updateFeeds(watchedState, updateInterval);
   form.addEventListener('submit', (objEvent) => {
     objEvent.preventDefault();
-    const url = state.elements.urlInput.value;
+    const url = urlInput.value;
     loadFeed(url, watchedState);
   });
 };

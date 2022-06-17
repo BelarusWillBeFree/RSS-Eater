@@ -2,3 +2,4 @@
 dist
 .eslintrc.json
 .eslintignore
+/.vscode/
