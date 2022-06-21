@@ -127,12 +127,20 @@ const main = () => {
   initI18next(state);
   const watchedState = getWatcher(state);
   const form = document.querySelector('form[name="form-search"]');
+  const posts = document.querySelector('.posts');
   const urlInput = document.getElementById('url-input');
   updateFeeds(watchedState, updateInterval);
   form.addEventListener('submit', (objEvent) => {
     objEvent.preventDefault();
     const url = urlInput.value;
     loadFeed(url, watchedState);
+  });
+  posts.addEventListener('click', (objEvent) => {
+    const idPost = objEvent.target.getAttribute('data-post-id');
+    const needAddIdPost = watchedState.viewedPosts.filter((elem) => elem === idPost).length === 0;
+    if (needAddIdPost) {
+      watchedState.viewedPosts.push(idPost);
+    }
   });
 };
 

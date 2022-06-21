@@ -63,7 +63,6 @@ const refreshFeeds = (state, elements) => {
 const changeColorInLink = (idPost, state) => {
   const needAddIdPost = state.viewedPosts.filter((elem) => elem === idPost).length === 0;
   if (needAddIdPost) {
-    state.viewedPosts.push(idPost);
     const linkChangeColor = document.querySelector(`a[data-post-id="${idPost}"]`);
     linkChangeColor.classList.remove('fw-bold');
     linkChangeColor.classList.add('fw-normal');
@@ -79,10 +78,6 @@ const addNewLink = (item, state) => {
   const linkViewed = state.viewedPosts.filter((elem) => elem === item.idPost).length > 0;
   setClassesFromStr(link, linkViewed ? 'fw-normal' : 'fw-bold');
   link.textContent = item.title;
-  link.addEventListener('click', (objEvent) => {
-    const idPost = objEvent.target.getAttribute('data-post-id');
-    changeColorInLink(idPost, state);
-  });
   return link;
 };
 
@@ -160,6 +155,9 @@ export default (state) => onChange(state, (path, value) => {
       refreshPosts(state, elements);
       break;
     case 'posts':
+      refreshPosts(state, elements);
+      break;
+    case 'viewedPosts':
       refreshPosts(state, elements);
       break;
     default:
