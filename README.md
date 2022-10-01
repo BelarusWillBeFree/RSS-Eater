@@ -1,7 +1,6 @@
 ### Hexlet tests and linter status:
 [![Actions Status](https://github.com/BelarusWillBeFree/frontend-project-lvl3/workflows/hexlet-check/badge.svg)](https://github.com/BelarusWillBeFree/frontend-project-lvl3/actions)
 [![Maintainability](https://api.codeclimate.com/v1/badges/805ca297f2c86d6b5b18/maintainability)](https://codeclimate.com/github/BelarusWillBeFree/frontend-project-lvl3/maintainability)
-### [Preview](https://frontend-project-lvl3-psi-three.vercel.app/)
 
 ### Setup
 ```
@@ -12,7 +11,7 @@ Make install
  Rss Eater - this is a handy, minimalist RSS-aggregator. 
 Upload your favorite RSS-format link in the input box and you get tracked content on a single page. 
 ### Here is a link to the project
-[RSS Eater](https://rss-eater.vercel.app/)
+[RSS Eater](https://frontend-project-lvl3-psi-three.vercel.app/)
 
 ### The following tools and approaches were used in creating the application:
 
