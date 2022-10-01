@@ -15,7 +15,6 @@ Upload your favorite RSS-format link in the input box and you get tracked conten
 
 ### The following tools and approaches were used in creating the application:
 
-* [Bootstrap](https://getbootstrap.com/) - components, grid and utilities
 * [i18next](https://github.com/i18next/i18next) - framework for locales
 * [Onchange](https://github.com/sindresorhus/on-change) - library for tracking and working with the state
 * [Axios](https://github.com/axios/axios)
